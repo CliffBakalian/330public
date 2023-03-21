@@ -1,0 +1,188 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+
+\chapter{Regular Expressions}
+\epigraph{\texttt{[A-Z][a-z]+\textbackslash{}d\{4\}}}{Chatbot+9000}
+
+Despite Regular expressions being something that is language independent, you will need to know how to use them in a language, and since this is taught in the Ruby section of the course, we will be learning how to use Ruby's regular expressions.
+There will then be a smaller section on how to use them in OCaml, but that's more syntactical than anything really substantive. 
+Regex comes from the theory related very closely to finite automata which is a later chapter so for now we will do just the basics and a surface level of the topic here. 
+
+\section{Introduction}
+For those that do not know, programs live in RAM on the machine. 
+Since RAM is wiped everytime you power down your machine\footnote{for the most part. There is always the \href{https://en.wikipedia.org/wiki/Cold_boot_attack}{Cold Boot Attack}}, programs and program memory is designed to live short term. 
+For long term storage, we need to use hard drives, since what is written to a hard drive is saved for a much longer period of time. 
+When we write to the hard drive we typically do this by writing a file and saving it. 
+
+One defining feature of the UNIX family is the idea that everything is treated as a file, and for the most part, this works fine since everything that is stored is stored as a file. 
+We have various file types and file descriptors but ultimately whenever we need to save data for long-term storage, we save it to a file (which ultimately is just a segment of bytes in memory).
+This also means that whenever we need to load something from storage, we need to open up a file and read from it.
+
+Opening a file and getting the data from it is the easy part. 
+The hard part is to try and parse and make use of the data. 
+Typically from a coding perspective, you open a file, read from it and then have a string of data. 
+Being able to properly and efficiently parse this string is what loading typically is. 
+Examples of this is reading a save file for a videogame, loading an image from a \texttt{.png} file, loading settings from a config file. 
+Regardless reading and parsing strings is important, but can be hard to do.
+
+Many would think that if you are trying to read certain data from a string, that methods that deal with strings is the solution.
+If I loaded a configuration file and wanted to know if I had to set a value to \cout{true} then I would probably want to check if the string has a subtring of \cout{true}.
+This is certainly one way to solve this problem, but it soon gets very inefficient with large amounts of data. 
+The solution to some of our problems here is Regular Expressions, or more commonly known as RegEx.
+
+\section{Regular Expression Basics}
+At a basic level, a \textbf{Regular Expression} is a pattern that describes a set of strings. 
+At a deeper level, a regular expression defines a regular language, a language which can be created from a finite state machine. 
+A finite state machine will be covered in a later chapter as well.
+For now however, we can think of regex as a tool (or library) used to search (and extract!) text. 
+
+When we wish to define a pattern to describe a set of strings, there are a few things that we must consider. 
+\begin{itemize}
+    \item An Alphabet - An \textbf{Alphabet} is the set of symbols or characters allowed in the string. 
+If our set of strings are for English words, we would have a different alphabet than one that describes a set of mandarin strings.
+\item Concatenation - Since most strings are longer than a single character, we will need some way to demonstrate the concatenation of single characters to create longer strings.
+\item Alternation - Being able to say one thing or another. We could say that any non-empty set is a union of 2 other sets. So I want to say that a string in set $S$ is in either $S_1$ or $S_2$ where $\{S_1,S_2\}$ is a partition of $S$.
+\item Quantification - The thing about patterns is that repeat. So if I want to have a pattern, then I need to allow for repetition. 
+\item Grouping - Ultimately not something that is the basis of regex, but is helpful in giving precedence to the above.
+\end{itemize}
+
+We will talk more about all of this in a future chapter. 
+
+\section{Regular Expression In Ruby}
+
+Now that we have an idea of what regular expressions are, let us see how we can use them in ruby, and what type of patterns we can create. 
+Ruby and many other language support the POSIX-EXT standard of regular expressions which is what we will be going over here. 
+Let's start out on just making our first pattern. 
+Much like \texttt{String}s denoted with single or double quotes, and arrays with the \texttt{[]} symbols, and hashes using \texttt{\{\}}, patterns are surrounded by the forward-slash: \texttt{/}. 
+\begin{lstlisting}[style=MyRubyStyle]
+# regex.rb
+p = /pattern/
+puts p.class #Regexp
+\end{lstlisting}
+
+Here is the very first example of a valid regular expression pattern. 
+This pattern is the string literal \cout{pattern}.
+That is, this pattern describes the set of strings that contain the substring \cout{pattern}.
+Not a very fun pattern, but a pattern nonetheless. 
+
+But Great! We have a pattern. Now how do we use it? 
+There are 2 main ways that I know of, one of which I like and the other I do not. We will go over the latter because it is easier version and my reason for not liking it it petty. Suppose we have our earlier pattern. 
+
+\begin{lstlisting}[style=MyRubyStyle]
+# regex-1.rb
+p = /pattern/
+if p =~ "pattern" then 
+  puts "Matched"
+else
+  puts "Not matched"
+end
+\end{lstlisting}
+If everything goes as planned, running this file will have \texttt{"Matched"} printed. Why does this happen? 
+\texttt{=~} is a method associated with Regexp objects which take in a string and returns an integer or nil depending on if
+the pattern can be found \textit{anywhere} in the string. If the pattern is found, it will return the index of the first 
+character of the first instance of the pattern. 
+
+\subsubsection{Regex Syntax}
+Ultimately this pattern is not fun nor interesting so let's take a look at other patterns and what they match. POSIX-EXT standard (and Ruby) regular expressions have the following pattern description/syntax.
+\begin{itemize}
+    \item Ranges: To talk about accepting a range of characters you can use the following: \texttt{/[a-z]/}. This particular example means accept a lowercase letter from a through z. You can of course modify this for uppercase: \texttt{/[A-Z]/}, digits: \texttt{/[0-9]/}, or smaller ranges \texttt{/[A-F]/}. Ultimately any ascii range works: \texttt{[!-\&]}. It is important to note that this will only match a single character.
+    \item Concatenation: we already saw this but if \texttt{/[a-z]/} matches a single character then \texttt{/[a-z][a-z]/} will match two consecutive lowercase letters. Technically \texttt{/pattern/} matches the seven character literals 'p', 'a', 't', 't', 'e', 'r', 'n' in a row.
+    \item Union: To match string that may have alternative spellings, you may use the union character: \texttt{/ste(v|ph)en/}. This may be useful for alternative spellings. Be careful because the scope of the union operator goes until a parenthesis or the beginning or end of the regex. That is, \texttt{/abc|def/} will match either "abc" or "def" whereas \texttt{/ab(c|d)ef/} will match either "abcef" or "abdef". If you have many things being unioned together, you can use the bracket syntax. \texttt{[/[aeiou'/]} will match the same strings as \texttt{/a|e|i|o|u/}. Technically \texttt{/[a-z]/} is shorthand for \texttt{/a|b|c|...|y|z/} or \texttt{/[abc..xz]/}. This also means you can combine ranges. \texttt{/[a-zA-Z0-9]/} will match any alphanumeric character. 
+    \item Repetitions: A pattern is typically thought as something repeating so of course there is a repeating operation. There are three types of repetitions that are supported:
+    \begin{itemize}
+        \item 0 or more times: Represented as a \texttt{*}, this is placed to say that the previous pattern can occur 0 or more times. For example: \texttt{/0*[0-9]/} could match any single digit number with any number of preceding zeros. (eg. "0001", "2", "00", "0", "00000000009" would all be matched). 
+        \item 1 or more times: Represented as a \texttt{+}, this is placed to say that the previous pattern can occur 1 or more times. For example: \texttt{/[0-9]+/} would match any number $\ge 0$. (eg. "0", "1", "10", "123","54234543" would all be matched).  
+        \item Exact or bounded repeats: Represented as \texttt{\{x\},\{x,y\},\{x,\},\{,y\}} you can make sure than a certain of number of repeats occurs. For example \texttt{/[0-9]\{2\}/} matched only 2 digit numbers like "00,"20","99". \texttt{0-9]\{3,\}} will match any number of at least 3 digits, whereas \texttt{/[0-9]\{,3\}/} will only match numbers that have at most 3 digits. Lastly \texttt{/[0-9]\{2,3\}/} will match numbers of only 2 or 3 digits. These bounds are inclusive.
+        \item 0 or 1 repeats: Represented as \texttt{?}, this will check if the pattern is there or not. For example \texttt{/-?[0-9]+/} will match positive or negative integers. 
+    \end{itemize}
+    It is important to note that all of these modifiers only apply to the immediately preceding pattern. That is to say \texttt{/cliff*/} and \text{/(cliff)*/} will match different things. You can use parenthesises if you wish to extend the scope of any of these operators. 
+    \item Negation: If you want to say \textit{anything but} a specific character, you can do so in the brackets with the carrot symbol. For example \texttt{/[\string^b][a-z]+/} says any word at least 2 characters long that does not start with the letter 'b'. 
+    \item Wild card: Represented as \texttt{.}, this will match any character. That is, despite how it looks, the pattern \texttt{/[0-9].[0-9]\{2\}/} would match on both "3.30" and "3:30". 
+    \item Capture Groups: see next page.
+\end{itemize}
+If you wish to use any of these special characters as a literal, you can escape them in the regex. That is, to actually match a float with 2 decimal places you can do so with the pattern \texttt{/[0-9]+\textbackslash{}.[0-9]\{2\}/}. 
+
+Additionally, using the \texttt{=~} method will search the entire string for a match. If you wish, you can make sure that it starts matching at the beginning of the string with the \texttt{\^} operator or the end of the string with the \texttt{\$} operator. Consider the following:
+\begin{lstlisting}[style=MyRubyStyle]
+# regular_expressions.rb
+if /^where/ =~ "anywhere in the string" then
+  puts "matched at the begining"
+end
+if /where$/ =~ "anywhere in the string" then
+  puts "matched at the end"
+end
+if /where/ =~ "anywhere in the string" then
+  puts "matched somewhere in the string"
+end
+\end{lstlisting}
+
+Here the only thing printed is \texttt{Matched somewhere in the string}.
+\subsubsection{Capture Groups}\label{grouping_section}
+
+Now that you can check to see if a string matches a pattern, we can move onto the more useful part: extracting out parts of a string. Suppose that you are given phone number such as (301) 405-1000\footnote{This is the university's phone number}. If you just need the area code, I suppose you could do something like \texttt{phone\_number[1..3]}. 
+But what if you have a text file of phone numbers that look like
+\begin{lstlisting}[style=MyRubyStyle]
+(111)-111-1111
+222-2222222
+3333333333
+\end{lstlisting}
+
+Then we would need to use a pattern to match what each line could be, and find a way of extracting the area code. 
+Regex makes this easy by having you surround the pattern you wish to capture with parenthesis. Consider the following:
+\begin{lstlisting}[style=MyRubyStyle]
+# capture.rb
+pattern = /([0-9]{3})-[0-9]{7}/
+if pattern =~ "111-1111111" then 
+    puts $1
+end
+\end{lstlisting}
+
+By placing the area code in parenthesis, regex knows to store the string that matches the pattern \texttt{/[0-9]{3}/}. Now where does regex store it? For Ruby, they are stored in top level variables which can be accessed with the \texttt{\$}. So \$1 referes to the first capture group. If you had multiple capture groups like \texttt{/([0-9]{3})-([0-9]{7})/} then \$2 would refer to the next captre group and so on. I am unsure how many capture groups can exist with this method.
+
+One thing to be careful about is the fact that parenthesis are also used for scoping of things like the \texttt{*} operator so those are also captured. Capture groups are ordered by when the opening parenthesis occurs so you can nest capture groups like so: \texttt{/(([0-9])[0-9]{2})-[0-9]{7}/}. 
+\begin{lstlisting}[style=MyRubyStyle]
+# capture-1.rb
+pattern = /(([0-9])[0-9]{2}))-[0-9]{7}/
+if pattern =~ "123-4567890" then 
+    puts $1
+    puts $2
+end
+\end{lstlisting}
+This will print out \texttt{123} and then \texttt{1}. 
+One other important thing to note is that whenever the \texttt{=~} method is called, then these top level variables \$1, \$2, etc, are all reset. This is the main reson as to why I do not like this method of matching patterns despute how easy it is. 
+
+The way that I prefer to match patterns is by using the \texttt{match} method. This instead returns an array of all matched groups (if any) which means I can store the results to a variable and refer to them later and not worry about data being wiped. That's it, the only reason why I do not like the previously described method.
+
+You can actually test and see what is accepted and captured using this fun online tool called \url{http://rubular.com}. That or you can play around with the following code segments and see what happens. 
+
+\begin{lstlisting}[style=MyRubyStyle]
+# capture-2.rb
+pattern = /[A-Z][A-Z]*/
+strs = ["a","A","abcD","ABDC"] 
+for test_string in strs
+  if pattern =~ test_string
+    puts "matched"
+  else
+    puts "not matched"
+  end
+end
+
+#what if the pattern and test strings are as follows:
+pattern = /a[A-Za-z]?/
+strs = ["a","abd","bad"]
+
+pattern = /^a[A-Za-z]?$/
+strs = ["a","abd","bad"]
+
+pattern = /a*b*c*d*/ # how is this different from /[a-d]/ ?
+strs = ["abcd", "bad", "cad", "aaaaaacd", "bbbdddd"]
+
+pattern = /^(..)$/
+strs = ["even","odd","four","three","five"]
+
+# an even number of vowels
+pattern = /^([^aeiou]*[aeiou][^aeiou]*[aeiou][^aeiou])*$/
+\end{lstlisting}
+
+\section{Regular Expression In OCaml}
+\end{document}

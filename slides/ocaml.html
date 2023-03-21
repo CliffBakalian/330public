@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>CMSC330 - Ocaml Intro</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/white.css" id="theme">
+		<link rel="stylesheet" href="plugin/highlight/stackoverflow.css">
+
+		<link rel="stylesheet" href="dist/mystyle.css"> 
+	</head>
+
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-auto-animate data-auto-animate-unmatched="fade-up">
+          <h1>CMSC330</h1>
+          <h3>Ocaml Intro</h3>
+				</section>
+
+				<section data-auto-animate class='fixvert'style="height: 600px">
+					<h3>OCaml Intro</h3>
+					<div class='fragment tl-diamond' data-fragment-index="1" data-id="1" style="background:purple;top:100px;"></div>
+					<div class='fragment tl-data' data-fragment-index="1" style="top:93px;">Functional Programming</div>
+
+					<div class='fragment tl' data-fragment-index="2" style="top:140px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="2" data-id="2" style="background:blue;top:180px;"></div>
+					<div class='fragment tl-data' data-fragment-index="2" style="top:173px;">Ocaml Env</div>
+
+					<div class='fragment tl' data-fragment-index="3" style="top:220px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="3" data-id="3" style="background:green;top:260px;"></div>
+					<div class='fragment tl-data' data-fragment-index="3" style="top:253px;">Functions and Expressions</div>
+				</section>
+
+				<section data-auto-animate class='fixvert' style="height:600px;">
+					<h3>Functional Programming</h3>
+					<div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+        </section>
+				<section data-auto-animate style="height:600px;">
+					<h3>Functional Programming</h3>
+					<div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+          <section data-auto-animate>
+          <h5></h5>
+          <p>Functional Programming: a programming paradigm based on functions</p>
+          <p class='fragment fade-up'>Programming Paradigm: classification of programming approach based behaviour of code</p>
+          </section>
+          <section data-auto-animate>
+          <p>Programming Paradigm: classification of programming approach based behaviour of code</p>
+          <ul>
+          <li class='fragment fade-up'>Typically used interchangibly with language features</p>
+          <li class='fragment fade-up'>Ruby is imperative, object-oriented, reflective and technically functional</p>
+          <li class='fragment fade-up'>OCaml is imperative, object-oriented and functional</p>
+          <ul>
+          </section>
+          <section data-auto-animate>
+          <p>Features of functional languages</p>
+          <ul>
+          <li class='fragment fade-up'>Immutable State</p>
+          <li class='fragment fade-up'>Declarative Programming</p>
+          <li class='fragment fade-up'>Referential transparency</p>
+          <li class='fragment fade-up'>Realistic about the Machine</p>
+          <ul>
+          </section>
+
+          <section data-auto-animate>
+          <p>Program State: the state of the machine at any given time</p>
+          <p class='fragment fade-up'>Typically described as the contents of variables</p>
+          <pre style='width:400px'><code class='fragment' data-trim data-line-numbers>
+# imperative.rb
+x = x + 1
+a[0] = 42
+i++
+          </code></pre>
+          <p class='fragment fade-up'>Imperative: State is mutable, changing or destructive</p>
+          </section>
+
+          <section data-auto-animate>
+          <p>Imperative: State is mutable, changing or destructive</p>
+          <p class='fragment fade-up'>Can cause side effects <span class='fragment fade-up'>(which is bad)</span></p>
+          <pre style='width:400px'><code class='fragment' data-trim data-line-numbers>
+# side_effects.rb
+@count = 0
+def f(node)
+  node.data = @count
+  @count+=1
+  @count
+end
+          </code></pre>
+          <p class='fragment fade-up'>No Referential transparency: replace expression with value with no side effects</p>
+          <pre style='width:610px'><code class='fragment' data-trim >
+f(x) + f(x) + f(x) != 3 * f(x) != 1 + 2 + 3
+          </code></pre>
+          </section>
+
+          <section data-auto-animate>
+          <p>Imperative: State is mutable, changing or destructive</p>
+          <p class='fragment fade-up'>Reality Check: <span class='fragment fade-up'>No single state exists</span></p>
+          <pre style='width:400px'><code class='fragment' data-trim data-line-numbers>
+# states.c
+int x = 1;
+if (fork() == 0)
+  x = x + 1;
+else
+  x = x * 5;
+wait(NULL)
+printf("x: %d\n", x);
+          </code></pre>
+          <p class='fragment fade-up'>Functional Programming has immutable state</p>
+          </section>
+
+          <section data-auto-animate>
+          <p>Functional Programming uses immutable state</p>
+          <ul>
+          <li class='fragment fade-up'>Will minimize side effects</p>
+          <li class='fragment fade-up'>Assumes referential transparency</p>
+          <li class='fragment fade-up'>Builds Correct Programs</p>
+          </ul>
+          </section>
+        </section>
+
+				<section data-auto-animate style="height:600px">
+					<h3>OCaml Env</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="background:blue;bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+          <section data-auto-animate>
+          <p>Our First Ocaml Program</p>
+          <pre style='width:450px'><code class='fragment' data-trim data-line-numbers>
+(* hello.ml *)
+print_string "Hello World!\n"
+          </code></pre>
+          <ul>
+          <li class='fragment fade-up'>No semi colon (for now)</li>
+          <li class='fragment fade-up'><tt>(* *)</tt> for comment</li>
+          </ul>
+          <p class='fragment fade-up'>OCaml is a compiled language</p>
+          <pre style='width:400px'><code class='fragment' data-trim>
+ocamlc hello.ml
+          </code></pre>
+          <ul>
+          <li class='fragment fade-up'><tt>a.out</tt>: executable</li>
+          <li class='fragment fade-up'><tt>hello.cmo</tt>compiled object (.o)</li>
+          <li class='fragment fade-up'><tt>hello.cmi</tt>compiled interface (like .h)</li>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <p>Helpful Programs</p>
+          <ul>
+          <li class='fragment fade-up'><tt>ocaml</tt>: repl like irb</li>
+          <li class='fragment fade-up'><tt>utop</tt>: like <tt>ocaml</tt> but better</li>
+          <li class='fragment fade-up'><tt>dune</tt> like Make</li>
+          <li class='fragment fade-up'><tt>opam</tt> package manager for OCaml</li>
+          </ul>
+          <p class='fragment fade-up'>Probably want to run <tt>dune utop src</tt></p>
+          <p class='fragment fade-up'>Will need to use <tt>;;</tt> to end epxressions in utop</p>
+          </section>
+        </section>
+
+				<section data-auto-animate style="height:600px">
+					<h3>Functions and Expressions</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="background:green;bottom:-30px;"></div>
+          <section data-auto-animate>
+          <p>Rememeber Syntax vs Semantics</p>
+          <p class='fragment'>Everything is an expression (e)</p>
+          <ul>
+          <li class='fragment fade-up'>Expressions evaluate to values (v)</li>
+          <li class='fragment fade-up'>All values are expressions, but not vice versa</li>
+          <li class='fragment fade-up'>Expressions have types (t)</li>
+          <li class='fragment fade-up'><tt>e: t</tt> will mean expression <tt>e</tt> has type <tt>t</tt></li>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <pre style='width:80px'><code data-trim>
+1 + 3
+          </code></pre>
+          <p class='fragment'>the expression <tt>1+3</tt> has type <tt>int</tt></p>
+
+          <pre style='width:80px'><code class='fragment' data-trim>
+true
+          </code></pre>
+          <p class='fragment'>the value <tt>true</tt> has type <tt>bool</tt></p>
+          <p class='fragment'>Expressions have types</p>
+          </section>
+
+          <section data-auto-animate>
+          <p>Expressions have types</p>
+          <p class='fragment'>The <tt>if</tt> expression</p>
+          <pre style='width:500px'><code class='fragment' data-trim>
+(if e1:bool then e2:t else e3:t):t
+          </code></pre>
+          <p class='fragment'>Actual Syntax:</p>
+          <pre style='width:350px'><code class='fragment' data-trim>
+if e1 then e2 else e3
+          </code></pre>
+          <p class='fragment'>Static and Latent Typing</p>
+          </section>
+          <section data-auto-animate>
+          <p>Expressions have types</p>
+          <p class='fragment'>functions are  expressions</p>
+          <pre style='width:350px'><code class='fragment' data-trim data-line-numbers>
+(* function.ml *)
+let f x = 
+  if x mod 2 = 0 then
+    1
+  else
+    0
+;;
+          </code></pre>
+          <p class='fragment'>The expression <tt>f</tt> has type <tt>int->int</tt></p>
+          <p class='fragment'>Type Inference: inferring a variable's type</p>
+          </section>
+          <section data-auto-animate>
+          <pre style='width:350px'><code data-trim data-line-numbers>
+(* function.ml *)
+let f x = 
+  if x mod 2 = 0 then
+    1
+  else
+    0
+;;
+          </code></pre>
+          <p class='fragment fade-up'>Function Definition Syntax</p>
+          <p class='fragment fade-up'><tt>let f x1 ... xn = e</tt></p>
+          <p class='fragment fade-up'>Function Calling Syntax</p>
+          <p class='fragment fade-up'><tt>f x1 ... xn</tt></p>
+          </section>
+          <section data-auto-animate>
+          <p>Function Calling Syntax</p>
+          <p><tt>f x1 ... xn</tt></p>
+          <p class='fragment fade-up'>Things that happen</p>
+          <ul>
+          <li class='fragment fade-up'>Each argument <tt>x</tt> is evaluated to a value <tt>v</tt></li>
+          <li class='fragment fade-up'>Substitute all <tt>x</tt> in <tt>e</tt> with <tt>v</tt></li>
+          <li class='fragment fade-up'>Call the new expression <tt>e'</tt></li>
+          <li class='fragment fade-up'>Evaluate <tt>e'</tt> to value <tt>v'</tt></li>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <pre style='width:300px'><code data-trim data-line-numbers>
+(* factorial.ml *)
+let rec f n = 
+  if n = 0 then
+    1
+  else
+    n * fact (n-1)
+;;
+f 2;;
+          </code></pre>
+          <p class='fragment fade-up'>Type of <tt>f</tt>: <tt>int -> int</tt></p>
+          <p class='fragment fade-up'>Type of <tt>f 2</tt>:<tt>int</tt></p>
+          <p class='fragment fade-up'>Value of <tt>f 2</tt>: 2</p>
+          </section>
+          <section data-auto-animate>
+          <p>More on Type Checking</p>
+          <p class='fragment fade-up'>Types are inferred by operations they use</p>
+          <pre style='width:700px'><code class='fragment' data-trim data-noescape data-line-numbers=2-7|9-14|16-20|22-23|25-27>
+(* types.ml *)
+(* compare two same types *)
+1 = 1
+x = y
+x > y
+x < y
+(* x and y must have the same type *)
+
+(* int have operators *)
+3 + 4
+x - y
+x * y
+x / y
+x mod y
+
+(* floats have different ones *)
+3.2 +. 4.
+x -. y
+x *. y
+x /. y
+
+(* Strings have some too*)
+"hello" ^ " world"
+
+(* latent typing means inference *)
+let f x y = if x > y then x else y-4;;
+(* int -> int -> int *)
+          </code></pre>
+          </section>
+        </section>
+
+      </div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/math/math.js"></script>
+    <script src="plugin/search/search.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+		<script>
+     Reveal.configure({
+        keyboard: {
+          40: 'next', // go to the next slide with down arrow
+          38: 'prev', // go to the next slide with up arrow
+        }
+      });
+			Reveal.initialize({
+				center: true,
+				hash: true,
+        controlsTutorial: false,
+        showSlideNumber: 'print',
+        pdfSeparateFragments: false,
+				math: {
+					// mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+					config: 'TeX-AMS_HTML-full',
+					TeX: {
+						Macros: {
+							R: '\\mathbb{R}',
+							set: [ '\\left\\{#1 \\; ; \\; #2\\right\\}', 2 ]
+						}
+					}
+				},
+				plugins: [ RevealHighlight, RevealMarkdown, RevealMath, RevealSearch, RevealZoom ]
+
+			});
+		</script>
+	</body>
+</html>

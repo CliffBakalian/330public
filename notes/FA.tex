@@ -1,0 +1,1093 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+
+\chapter{Finite State Machines}
+\epigraph{Finite State Machines? More like infinite town devices}{Cringe}
+\section{Introduction}
+So far we have talked about the language features that languages may have. 
+However, now we want to start talking about how we can take features from one language, and implement them in another. A quick but perhaps naive approach may be something like making a library or some wrapper functions. For a simple example, maybe I wanted to add \texttt{booleans} to \texttt{C}. I can just write a \texttt{\#define} macro for \texttt{1} and \texttt{0} which we name as \texttt{true} and \texttt{false}. 
+\begin{lstlisting}[style=MyCStyle]
+#define FALSE 0
+#define TRUE 1
+\end{lstlisting}
+For a more complicated example if I wanted to add pattern matching in \texttt{C}, then maybe I create something like the following:
+\begin{lstlisting}[style=MyCStyle]
+// something to hold pattern matched data
+struct Data{
+  ...
+}
+// need to create a new match function
+// takes in the data to match
+// takes in list of (data -> int (read bool)) functions
+// take in a list of functions that take in data to use and return anything (void pointer)
+void* match(data* value, int (**patterns)(data*), void* (**exprs)(data*))
+
+\end{lstlisting}This represents a new matchable data type, and a new match function.\footnote{See Appendix A for a rough implementation //TODO}. This way is nice for simple things, but for complex ways, it's a bit of a hassle to work with. At that point, you might as well use a different language. Which is exactly the point: you should either use a different language, or you can always add something to the language. To add a feature to a language, you need to do so by changing the compiler (Or if we want to go one step further, let's design our own language, which means we need to make a new compiler-HAH!).
+
+\subsection{Compilers}
+
+While this is not CMSC430: Compilers, we need to setup the basis of compilation. We will talk about this more in depth in a future chapter, but here's a quick overview. A compiler is a language translator (typically some higher level programming language to assembly). To translate one language to another we need to do the following:
+\begin{itemize}
+    \item break down the language to bits that hold information
+    \item take those bits and figure out how to store that information in a meaningful way
+    \item take the stored information and map it to the target language. 
+    \item generate the target language. 
+\end{itemize}
+
+The best way to break down the language is to use regular expressions to create what we call tokens. However what if your language doesn't have regular expressions? Simple: let's implement regular expressions in a way that we don't need to compile. To do so, we will need to find the link between our machine and a language. 
+% For example I want to translate the following to Spanish: "Hello. My name is Cliff and I like the color purple." This sentence has noise so let's break it down to bits that are important. We have a greeting, a name, and a color. So let's store that "greeting: hello", "name: cliff", and "color: purple". Let's map this to the Spanish equivalent: "hola:", "cliff", "morado". Now's let's add some words for this to make sense in Spanish: "Hola. Mi nombre est Cliff y me gusta el color morado". Now no compiler or translator is perfect and won't beat just using the original language: "Hola, me llamo Cliff y me gusta morado". 
+
+\subsection{Background - Automata Theory}
+Imagine that we want to create a machine that can solve problems for us. Our machine should take in a starting value or values, a series of steps, and then give us output. Depending on when and who you took CMSC250 with, you already did this. A circuit or logic gate is the most basic form of this. If our input is values of true and false (1 and 0), let us put those inputs into a machine that \textit{ands}, \textit{ors} and \textit{negates} to get an output value. 
+
+The issue here is we do not have any memory. We cannot refer to things we previously computed, but only refer to things we are inputting in each gate. Once we add a finite amount of memory, we can accomplish a whole lot more and we get what we call finite automata (FA). I use finite automata interchangeably with finite state machine (FSM) but typically FA is used in the context of abstract theory and FSM is used with the context of an actual machine, but they all refer to the same thing. 
+
+Once we start adding something like a stack (infinite memory), we get a new type of machine called push-down automata (PDA) where we theoretically have infinite memory, but we can only access the top of the stack. Lifting this top-only read restriction, we get what is known as a Turing machine\footnote{Initially called an 'a-machine' or atomic machine by Alan Turing.}. As formalized in the Church-Turing thesis, any solvable problem can be converted in a Turing Machine. A Turing machine that creates or simulates other Turing machines is called an Universal Turing Machine (UTM). Fun fact: Our machines we call computers are UTMs). 
+
+All of this is to say that a compiler wants to output a language that is turing complete, one which can be represented by a turing machine. Regular expressions on the other hand, describe what we call regular languages, and regular languages can be represented by finite automata. So we will start with FSMs but know that when we get to compilation, we need something more.
+
+\subsection{Finite State Machines}
+
+Let's start by modeling a universe and breaking it down to a series of discrete states and actions.
+Let us suppose that my universe is very small. There is just me, an room and a compass. Suppose I am standing facing north in this room. Let's call this state $N$. When facing north, I have two options: turn right $90^{\circ}$ and face East, or turn left $90^{\circ}$ and face West. Let's give these states some names: states $E$ and $W$ respectively. From each of these new positions (facing west, or facing east), I could turn left or right again and either end up facing back north, or face South. Let's give the state of facing south a name: $S$. If I create a graph that represents all possible states and actions of the universe, I could create a graph that looks like:
+
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {W};
+    \node (B) at (0,4) {N};
+    \node (C) at (4,4) {E};
+    \node (D) at (4,0) {S};
+\end{scope}
+
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \path [->] (C) edge [bend right] node {Right} (D);
+    \path [->] (B) edge [bend right] node {Right} (C);
+    \path [->] (D) edge [bend right] node {Right} (A);
+    \path [->] (A) edge [bend right] node {Right} (B);
+    \path [->] (B) edge [bend right] node {Left} (A);
+    \path [->] (C) edge [bend right] node {Left} (B);
+    \path [->] (D) edge [bend right] node {Left} (C);
+    \path [->] (A) edge [bend right] node {Left} (D);
+    
+\end{scope}
+\end{tikzpicture}
+\end{center}
+This graph represents a finite state machine. A physical machine can be made to do these things but for the most part we will emulate this machine digitally. We typically define a FSM as a 5-tuple:
+\begin{itemize}
+    \item A set of possible actions
+    \item A set of possible states
+    \item a starting state
+    \item a set of accepting states
+    \item a set of transitions
+\end{itemize}
+The set of transitions is the set of edges, typically defined as 3-tuple (starting state, action, ending state). To be clear: this is a graph. A transition is an edge, and a state is a node. This is not a good example to show what a starting or accepting state is, but we will see that in the next section. 
+
+The important takeaway is \textbf{Based on where I am (which state), and what action occurs (which edge I choose), I can tell you where I will end up}. So given an input, and a series of instructions, I can give you an output (sound familiar?). For example, If I start at state $N$, and my instructions are to go left, left, right, left, left, right, right, I can traverse my path ($N-> W -> S -> W -> S -> E -> S -> W$) to know where I am and return it (My output is $W$ here). 
+
+\section{Regex}
+
+So we did this whole thing with graphs and talked about what a machine is and a single example a use case. 
+Let's talk about another use case: regular expressions. For regular expressions, we define a FSM as a 5-tuple very similarly as what we previously had, but instead of actions, we have a letter of the alphabet. That is we have
+\begin{itemize}
+    \item the alphabet ($\Sigma$) which is a set of all symbols in the regex. 
+    \item a set of all possible states ($S$)
+    \item a starting state ($s_0$)
+    \item a set of final (or accepting) states ($F$)
+    \item a set of transitions ($\delta$)
+\end{itemize}
+To be clear on types: $s_0 \in S$ and $F \subseteq S$. This is because a FSM can only have 1 starting state (no more, no less), but any number of accepting states (including 0). In the previous example we had an understood starting state ($N$), but not really any accepting states. Let us see an example of a FSM for the regular expression \texttt{/(0|1)*1/}. 
+
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node[double] (B) at (4,0) {$S1$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \draw[very thick,->,shorten >=1pt] (A) to [out=180,in=270,loop,looseness=4.8] node {0} (A);
+    \path [->] (B) edge [bend right] node {0} (A);
+    \path [->] (A) edge [bend right] node {1} (B);
+    \draw[very thick,->,shorten >=1pt] (B) to [out=0,in=270,loop,looseness=4.8] node {1} (B);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+This machine represents the regular expression \texttt{/(0|1)*1/}. Recall that a regular expression describes a set of strings. This set of strings is called a language. Examples of strings in the language described by the regular expression \texttt{/(0|1)*1/} would be \texttt{"1"}, \texttt{"10101"}, and \texttt{"0001"}. When we say that a FSM accepts a string, it means that when starting at the starting state (denoted by an arrow with no origin), after traversing the graph after looking at each symbol in the string, we end up in an accepting state (states denoted by a double circle). Let's see an example.
+
+Given the above FSM, suppose we want to check if the string \texttt{"10010"} is accepted by the regex. We start out in state $S0$ since it has the arrow pointing to it as the starting state. We then look at the first character of the string: \texttt{"1"} and consume it. If we are in state $S0$ and see a \texttt{"1"}, we will move to state $S1$. We then look at the second character of the string (since we consumed the first one): \texttt{"0"} and consume it. Since we are in state $S1$, if we see a \texttt{"0"}, then we move to state $S0$. We then proceed to traverse the graph in this manner until we have consumed the entire string. The traversal should look something like
+\begin{center}
+\texttt{S0 -1-> S1 -0-> S0 -0-> S0 -1-> S1 -0-> S0}
+\end{center}
+Since we end up at state $S0$, and $S0$ is not an accepting state (it does not have a double circle), then we say this machine (this regular expression) does not accept the string \texttt{"10010"}. Which is true, this regex would reject this string. 
+
+On the other hand if traversed the graph with \texttt{"00101"}, our traversal would look like 
+\begin{center}
+    \texttt{S0 -0-> S0 -0-> S0 -1-> S1 -0-> S0 -1-> S1}
+\end{center}
+and we would end up in state $S1$ which is an accepting state. So we could say that the machine (the regular expression) does accept the string \texttt{"00101"}. 
+
+One final thing: a FSM for regex only will tell you if a string is accepted or not\footnote{that is, if the string is in the language the regular expression describes. Any language a regular expression can describe is called a Regular Language}. It will not do capture groups, will not tell you if the input is invalid, it will only tell you if the string is accepted (in the case of invalid input, it will tell you the string is not accepted). 
+
+\section{Deterministic Finite Automata}
+
+All FSMs can be described as either deterministic or non-deterministic. So far we have seen only deterministic finite automata (DFA). If something is deterministic (typically called a deterministic system), then that means there is no randomness or uncertainty about what is happening (the state of the system is always known) \footnote{Determinism in philosophy is about if there is such a thing on free will and I would definitely recommend reading David Hume's and David Lewis's take on causality}. For example, given the following DFA:
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node[double] (A) at (0,0) {$S0$};
+    \node[double] (B) at (4,0) {$S1$};
+    \node[double] (C) at (0,-4) {$S2$};
+    \node[double] (D) at (4,-4) {$S3$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \path [->] (A) edge node {b} (B);
+    \path [->] (A) edge [bend right] node {c} (D);
+    \path [->] (A) edge node {a} (C);
+    \path [->] (B) edge [bend right] node {a} (C);
+    \path [->] (B) edge node {c} (D);
+    \path [->] (C) edge [bend right] node {b} (B);
+    \path [->] (C) edge [bend right] node {c} (D);
+    \path [->] (D) edge [bend right] node {b} (B);
+    \path [->] (D) edge node {a} (C);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+Now this graph is missing a few states (one really). What happens when I am in state $S0$ and I see a \texttt{"b"}? There is an implicit state which we call a \texttt{"garbage"} or \texttt{"trash" state}. A trash state is a non-accepting state where once you enter, you do not leave. There is an implicit one if you are trying to find a transition symbol or action which does not have output here. That is, there is an edge from $S1$ to the \texttt{garbage state} on the symbol \texttt{"b"}. There are also transitions to the garbage state from $S2$ on \texttt{"a"} and $S3$ on \texttt{"c"}. If we really wanted to draw the garbage state in, we could like so (but there really is no need to do so):
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node[double] (A) at (0,0) {$S0$};
+    \node[double] (B) at (4,0) {$S1$};
+    \node[double] (C) at (0,-4) {$S2$};
+    \node[double] (D) at (4,-4) {$S3$};
+    \node (E) at (-2,-2) {G};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \path [->] (A) edge node {b} (B);
+    \path [->] (A) edge [bend right] node {c} (D);
+    \path [->] (A) edge node {a} (C);
+    \path [->] (B) edge [bend right] node {a} (C);
+    \path [->] (B) edge node {c} (D);
+    \path [->] (C) edge [bend right] node {b} (B);
+    \path [->] (C) edge [bend right] node {c} (D);
+    \path [->] (D) edge [bend right] node {b} (B);
+    \path [->] (D) edge node {a} (C);
+    \path [->] (C) edge node {a} (E);
+    \path [->] (B) edge node {b} (E);
+    \path [->] (D) edge node {c} (E);
+     \draw[very thick,->,shorten >=1pt] (E) to [out=135,in=225,loop,looseness=4.8] node [left] {a,b,c} (E);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+Regardless if we indicate a trash state or not, no matter which state I am in, I know exactly which state I will be in at any given time.
+
+\section{Nondeterministic Finite Automata}
+
+The other type of FSM is a nondeterministic finite automata (NFA).
+Nondeterministic in math terms means that is something that is some randomness or uncertainty in the system. A NFA is still a FSM, the only difference is what are allowed as edges in the graph. There are 2 of them. Let's talk about one of them now. Consider the following FSM:
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S1$};
+    \node (C) at (4,0) {$S2$};
+    \node[double] (D) at (6,0) {$S3$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \draw[very thick,->,shorten >=1pt] (A) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {a,b} (A);
+    \path [->] (A) edge node {a} (B); 
+    \path [->] (B) edge node {b} (C);
+    \path [->] (C) edge node {b} (D);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+This machine represents the regular expression \texttt{/(a|b)*abb/}. There is still a starting state, transitions, ending states, all the things we see for a FSM. However, there is something interesting when we look at the transitions out of $S0$. If I am looking at the string \texttt{"abb"}, then when I am traversing, do I go from $S0$ to $S1$ or do I loop back around and stay in $S0$? In fact, there are two ways I could legally traverse this graph: 
+\begin{center}
+    \texttt{S0 -a-> S1 -b-> S2 -b-> S3}\\
+    \texttt{S0 -a-> S0 -b-> S0 -b-> S0}
+\end{center}
+
+Since the traversal of the graph is uncertain, we call this non-deterministic. To check acceptance for an NFA, we have to try every single valid path and if at least one of them ends in an accepting state, then we accept the string. Since we have to check all possible paths, you can imagine that this is quite a costly operation on an NFA. Additionally, all NFAs have a DFA equivalent. So why use an NFA?
+
+Let us first consider why we are using a FSM. We want to implement regex. To convert from a regular expression to a DFA can be difficult. Consider the above NFA for \texttt{/(a|b)*abb/}. Now consider the following DFA for the same regex:
+
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S1$};
+    \node (C) at (4,0) {$S2$};
+    \node[double] (D) at (6,0) {$S3$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \draw[very thick,->,shorten >=1pt] (A) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {b} (A);
+    \path [->] (A) edge node {a} (B);
+    \draw[very thick,->,shorten >=1pt] (B) to [out=292.5,in=202.5,loop,looseness=4.8] node {a} (B);
+    \path [->] (B) edge node {b} (C);
+    \path [->] (C) edge [bend right] node {a} (B);
+    \path [->] (C) edge node {b} (D);
+    \path [->] (D) edge [bend left] node {a} (B);
+    \path [->] (D) edge [bend right] node {b} (A);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+It is much easier to go from a regular expression to an NFA than it is to go from a regular expression to a DFA. Additionally, NFAs, because they can be more condensed, are typically more spatially efficient than their DFA counterpart. However, there is of course a downside: NFA to regex is difficult, and checking acceptance is very costly. 
+However, NFA to DFA is a one time cost and its less costly to check acceptance on a DFA. Additionally, going from a DFA to a regular expression is much easier. Now keep in mind, technically all DFAs are NFA, but not all NFAs are DFAs.
+
+To visualize this, we typically draw the following triangle
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {Regex};
+    \node (B) at (4,0) {\ NFA\ \ };
+    \node (C) at (2,-2) {\ DFA\ \ };
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \path [->] (A) edge (B);
+    \path [->] (B) edge (C);
+    \path [->] (C) edge (A);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+We will talk about how to convert between all of these in a bit, but before we get too far ahead of ourselves, we need to consider the other difference an NFA has over a DFA: epsilon transitions. 
+
+An $\epsilon$-transition is a "empty" transition from one state to another. If we think of our graph as one where the edges transitions are the cost to traverse that edge, then an $\epsilon$-transition is an edge that does not cost anything to traverse (it does not consume anything). Consider the following NFA:
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S1$};
+    \node[double] (C) at (4,0) {$S2$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \path [->] (A) edge node {$\epsilon$} (B);
+    \path [->] (B) edge node {b} (C);
+    \path [->] (A) edge [bend right] node {a} (B);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+If I wished to check acceptance of the string \texttt{"b"}, then my traversal may look like:
+\begin{center}
+    \texttt{S0 -$\epsilon$-> S1 -b-> S2}
+\end{center}
+Whereas my traversal of the string \texttt{"B"} may look like:
+\begin{center}
+    \texttt{S0 -a-> S1 -b-> S2}
+\end{center}
+Knowing this, you can see that this machine represents the regular expression: $/a?b/$.
+
+\section{Regex to NFA}
+
+Now that we know what a FSM, NFA and a DFA is, then we can loop back around to our initial goal: implementing regular expressions. In order to do this, we will of course need to build an NFA. To do so, we need to think about the structure of a regular expressions. That is, we need to consider what the grammar of a regular expression. We will talk about grammars in a future chapter, but a grammar is basically rules that dictate what makes a valid expressions. Here is the grammar for a regular expression:
+\begin{center}
+    $\begin{array}{rl}
+         R \rightarrow & \emptyset \\
+         & \vert \epsilon \\
+         & \vert \sigma \\
+         & \vert R_1R_2 \\
+         & \vert R_1\vert R_2\\
+         & \vert R_1^*\\
+    \end{array}$
+\end{center}
+All this says is that any Regular expression is either
+\begin{itemize}
+    \item something that accepts nothing ($\emptyset$)
+    \item something that accepts an empty string ($\epsilon$)
+    \item something that accepts a single a single character ($\sigma$)
+    \item a concatenation of 2 Regular expressions ($R_1R_2$)
+    \item One regular expression or another regular expression ($R_1\vert R_2$)
+    \item A Kleene Closure of a regular expressions ($R_1^*$)
+\end{itemize}
+
+To convert from a regular expression to a NFA, all we need to figure out how to represent each of these things as an NFA. Since this grammar is recursive, we will start with the base cases, and then move on to the recursive definitions. 
+
+\subsection{Base Cases}
+
+There are three base cases here: $\emptyset, \epsilon, \sigma$. Let's look at each of these. 
+
+\subsubsection{The $\emptyset$}
+The empty set is a regex that accepts nothing (the set of strings (the language) it accepts is empty). This machine can be constructed as just the following:
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \path [->] (-1,1) edge (A);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+Even if $\Sigma$ has characters in it, we just have a single state, and upon seeing any value, we get a garbage state. 
+
+\subsubsection{The empty string ($\epsilon$)}
+The regular expression that only accepts the empty string means the set of accepted strings is $\{""\}$. This set is not empty so it is different from $\emptyset$. This machine can be constructed as the following: 
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node[double] (A) at (0,0) {$S0$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \path [->] (-1,1) edge (A);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+Even if $\Sigma$ has characters in it, we just have a single state, and upon seeing any value, we get a garbage state since we are not accepting any strings of with a size greater than 0.
+
+\subsubsection{A single character $\sigma$}
+The last base case is a regular expression which accepts only a single character of the alphabet. So if $\Sigma = \{"a","b","c"\}$, then we are looking for a regular expression that describes only \texttt{/a/}, \texttt{/b/}, or \texttt{/c/}. We call a single character $\sigma$. This machine can be represented in the following manner:  
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node[double] (B) at (2,0) {$S1$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \path [->] (-1,1) edge (A);
+    \path [->] (A) edge node {$\sigma$} (B);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+\subsection{Concatenation ($R_1R_2$)}
+
+Now that we have our base cases, we can begin to start showing how to do a recursive operation.
+Aside from the $\emptyset$, each base case has a starting state and an accepting state (sometimes these are the same state). Now since the $\emptyset$ is empty, all the recursive definitions cannot rely on it, so we don't need to really include it as a base case for these recursive calls. Hence, let us assume we have some previous regular expressions $R_1$ and $R_2$ that have a starting state and an accepting state.
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {};
+    \node[double] (C) at (4,0) {$S1$};
+    
+    \node (D) at (0,-2) {$S2$};
+    \node (E) at (2,-2) {};
+    \node[double] (F) at (4,-2) {$S3$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \node at (-2,0) {$R_1$};
+    \path [->] (-1,1) edge (A);
+    \path [->] (A) edge (B);
+    \path [->] (B) edge (C);
+    
+    \node at (-2,-2) {$R_2$};
+    \path [->] (-1,-1) edge (D);
+    \path [->] (D) edge (E);
+    \path [->] (E) edge (F);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+Now we don't know what regular expression $R_1$ and $R_2$ are, just that they have 1 starting state, and 1 accepting state. The small, unlabeled nodes here just represent any internal nodes could exist (if any). 
+
+To concatenate these two together, it means that if $L_1$ is the language corresponding to $R_1$ and $L_2$ is the language corresponding to $R_2$, then we are trying to describe $L_3$ which can be represented as $\{xy\vert x \in L_1 \land y \in L_2\}$. For example, if $R_1$ is \texttt{/a/} and $R_2$ is \texttt{/b/}, then $L_1 = \{"a"\}$ and $L_2 = \{"b"\}$. This means that $L_3 = \{"ab"\}$. 
+
+So to take our previous machines, and create a new machine which represents our concatenation operations, we can do so by looking at what our new final states are, and how we get an ordering. Our new machine should have 1 final state which should be the same as our $R_2$ machine, and should have a way to get from $R_1$ to $R_2$ without costing us anything. By implementing these two steps, we get the following machine: 
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {};
+    \node (C) at (4,0) {$S1$};
+    
+    \node (D) at (0,-2) {$S2$};
+    \node (E) at (2,-2) {};
+    \node[double] (F) at (4,-2) {$S3$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \path [->] (-1,1) edge (A);
+    \path [->] (A) edge (B);
+    \path [->] (B) edge (C);
+
+    \path [->] (C) edge node {$\epsilon$} (D);
+    \path [->] (D) edge (E);
+    \path [->] (E) edge (F);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+To take our previous example of $R_1$ being \texttt{/a/} and $R_2$ being \texttt{/b/}, when we want to concatenate these machines we get the following machine:
+
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (4,0) {$S1$};
+    
+    \node (D) at (0,-2) {$S2$};
+    \node[double] (E) at (4,-2) {$S3$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \path [->] (-1,1) edge (A);
+    \path [->] (A) edge node {a} (B);
+    
+    \path [->] (B) edge node {$\epsilon$} (D);
+    \path [->] (D) edge node {b} (E);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+Now, I would say that we are done at this point, as we have a machine that accepts only the concatenated string, with one starting state and one final state (having only one final state is not a restriction of a FSM, but having only one allows us to inductively build our machines here). If we really wanted to, we could optimize the machine a little bit, but it is not necessary. 
+
+\subsection{Branching ($R_1\vert R_2$)}
+
+Branching or union is the next recursive definition and requires a bit more work than our concatenation. Again, let us assume that we have some previous regular expressions $R_1$ and $R_2$ that have a starting state and an accepting state. 
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {};
+    \node[double] (C) at (4,0) {$S1$};
+    
+    \node (D) at (0,-2) {$S2$};
+    \node (E) at (2,-2) {};
+    \node[double] (F) at (4,-2) {$S3$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \node at (-2,0) {$R_1$};
+    \path [->] (-1,1) edge (A);
+    \path [->] (A) edge (B);
+    \path [->] (B) edge (C);
+    
+    \node at (-2,-2) {$R_2$};
+    \path [->] (-1,-1) edge (D);
+    \path [->] (D) edge (E);
+    \path [->] (E) edge (F);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+Again we don't know what regular expressions $R_1$ and $R_2$ are, just that they have one starting state and one accepting state. 
+
+To union two regular expressions together it means that if $L_1$ is the language corresponding to $R_1$ and if $L_2$ is the language corresponding to $R_12$, then we are trying to describe $L_3$ which can be represented as $\{x\vert x \in L_1 \lor x \in L_2\}$. For example if $R_1$ is \texttt{/a/} and $R_2$ is \texttt{/b/}, then $L_1 =\{"a"\}$ and $L_2 = \{"b"\}$. This means that $L_3 = \{"a","b"\}$. 
+
+So to take our previous machines and create a new machine which represents our union operation, we can do so by considering what it means to traverse the graph such that either previous machine is valid. Again, to keep our inductive properties, we need one starting state and one accepting state. Here is where the tricky part comes. We need to make sure that both $R_1$ and $R_2$ are accepted with a single accepting state, as well as making sure we can traverse $R_1$ or $R_2$ with only 1 start state. The easiest way to do so is by making use of $\epsilon$-transitions with 2 new states. Here is the resulting machine:
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {};
+    \node (C) at (4,0) {$S1$};
+    
+    \node (D) at (0,-2) {$S2$};
+    \node (E) at (2,-2) {};
+    \node (F) at (4,-2) {$S3$};
+    
+    \node (G) at (-1,-1) {$S4$};
+    \node[double] (H) at (5,-1) {$S5$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={rectangle},
+              every edge/.style={draw=black,very thick}]
+
+    \path [->] (A) edge (B);
+    \path [->] (B) edge (C);
+    
+    \path [->] (D) edge (E);
+    \path [->] (E) edge (F);
+    
+    \path [->] (-2,0) edge (G);
+    \path [->] (G) edge [left] node {$\epsilon$} (A);
+    \path [->] (G) edge [left] node {$\epsilon$} (D);
+    \path [->] (C) edge [above] node {$\epsilon$} (H);
+    \path [->] (F) edge [below] node {$\epsilon$} (H);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+This new machine still has one starting state, and one accepting state which means we can inductively build larger machines, and the $\epsilon$-transitions allow us to chose either path or go to the accepting state without consuming anything. To take our previous example of $R_1$ being \texttt{/a/} and $R_2$ being \texttt{/b/}, when we want to union these machines we get the following machine:
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S1$};
+    
+    \node (C) at (0,-2) {$S2$};
+    \node (D) at (2,-2) {$S3$};
+    
+    \node (E) at (-1,-1) {$S4$};
+    \node[double] (F) at (3,-1) {$S5$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={rectangle},
+              every edge/.style={draw=black,very thick}]
+
+    \path [->] (A) edge node [fill=white] {a} (B);
+    
+    \path [->] (C) edge node [fill=white] {b} (D);
+    
+    \path [->] (-2,0) edge (G);
+    \path [->] (E) edge [left] node {$\epsilon$} (A);
+    \path [->] (E) edge [left] node {$\epsilon$} (C);
+    \path [->] (B) edge [above] node {$\epsilon$} (F);
+    \path [->] (D) edge [below] node {$\epsilon$} (F);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+Again, we could choose to optimize this machine, but it's not necessary. 
+
+\subsection{Kleene Closure ($R_1^*$)}
+
+Kleene closure gives us the ability to repeat patterns infinitely many times and is the last recursive definition of a regular expression. Despite having the ability to infinitely repeat, it will look very similar to our union machine. Additionally, this is the only recursive definition that does not rely on two previous regular expressions, so here we only need to assume that we have some previous regular expressions $R_1$ that has a starting state and an accepting state. 
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {};
+    \node[double] (C) at (4,0) {$S1$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \node at (-2,0) {$R_1$};
+    \path [->] (-1,1) edge (A);
+    \path [->] (A) edge (B);
+    \path [->] (B) edge (C);
+
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+Again we don't know what regular expression $R_1$ is, just that it has one starting state and one accepting state. 
+
+The Kleene Closure of a language, is just analogous to the language's regular expression with the \texttt{*} operator. That is, if $L_1$ is the language corresponding to $R_1$ then we are trying to describe $L_2$ which can be represented as $\{x\vert x = \epsilon \lor x \in L_1 \lor x \in L_1L_1 \lor x \in L_1L_1L_1 \lor \dots\}$. For example, if $R_1$ is \texttt{/a/} then $L_1 = \{"a"\}$ and we are looking for \texttt{/a*/} or $L_2 = \{"","a","aa","aaa",\dots\}$. 
+
+So if we take our previous machine, we need to consider how we can accept the empty string as well as any number of repeats of a regular expression. The trick for this is in the definition. We are essentially 'or'ing together the same regular expression repeatedly. So will need to designate a new start state and a new ending state. Doing so will result in the following machine:
+
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {};
+    \node (C) at (4,0) {$S1$};
+    
+    \node (D) at (-2,0) {$S2$};
+    \node[double] (E) at (6,0) {$S3$};
+    
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \path [->] (-3,1) edge (D);
+    \path [->] (D) edge node {$\epsilon$} (A);
+    \path [->] (A) edge (B);
+    \path [->] (B) edge (C);
+    \path [->] (C) edge node {$\epsilon$} (E);
+    
+    \path [->] (D) edge [bend right] node {$\epsilon$} (E);
+    \path [->] (E) edge [bend right] node {$\epsilon$} (D);
+
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+Here is where the $\epsilon$-transitions become really important. To accept the empty string, we just use an $\epsilon$-transition to move from $S2$ to $S3$. For repeated values, we can just use the $\epsilon$-transitions from $S3$ to $S2$. Let's look at the previous example of $R_1$ being \texttt{/a/} and seeing the resulting Kleene closure, but also how we would traverse it. The machine would look like:
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S1$};
+    
+    \node (C) at (-2,0) {$S2$};
+    \node[double] (D) at (4,0) {$S3$};
+    
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \path [->] (-3,1) edge (C);
+    \path [->] (C) edge node {$\epsilon$} (A);
+    \path [->] (A) edge node {a} (B);
+    \path [->] (B) edge node {$\epsilon$} (D);
+    
+    \path [->] (C) edge [bend right] node {$\epsilon$} (D);
+    \path [->] (D) edge [bend right] node {$\epsilon$} (C);
+
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+If I wanted to accept the empty string my traversal would look like
+\begin{center}
+    \texttt{S2 -$\epsilon$-> S3}
+\end{center}
+
+If I wanted to accept \texttt{"a"}, then my traversal would look like
+\begin{center}
+    \texttt{S2 -$\epsilon$-> S0 -a-> S1 -$\epsilon$-> S3}
+\end{center}
+
+If I wanted to accept \texttt{"aa"}, then my traversal would look like
+\begin{center}
+    \texttt{S2 -$\epsilon$-> S0 -a-> S1 -$\epsilon$-> S3 -$\epsilon$-> S2 -$\epsilon$-> S0 -a-> S1 -$\epsilon$-> S3}
+\end{center}
+
+We can of course optimize this machine, but again it is not necessary. 
+
+\subsection{Example}
+
+For a quick example, if we wanted to make the NFA for the regular expression: \texttt{/(ab|cd)+/} the machine (with a few optimizations due to space) would look like: 
+
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,-1) {$S0$};
+    
+    \node (B) at (2,0) {$S1$};
+    \node (C) at (4,0) {$S2$};
+    \node (L) at (6,0) {$S3$};
+    \node (D) at (2,-2) {$S4$};
+    \node (E) at (4,-2) {$S5$};
+    \node (M) at (6,-2) {$S6$};
+    
+    \node (F) at (8,-1) {$S7$};
+    
+    \node (G) at (10,0) {$S8$};
+    \node (H) at (12,0) {$S9$};
+    \node (N) at (14,0) {$S10$};
+    \node (I) at (10,-2) {$S11$};
+    \node (J) at (12,-2) {$S12$};
+    \node (O) at (14,-2) {$S13$};
+    \node[double] (K) at (16,-1) {$S14$};
+    
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \path [->] (-1,0) edge (A);
+    \path [->] (A) edge node {$\epsilon$} (B);
+    \path [->] (A) edge node {$\epsilon$} (D);
+    \path [->] (B) edge node {a} (C);
+    \path [->] (D) edge node {c} (E);
+    \path [->] (C) edge node {b} (L);
+    \path [->] (E) edge node {d} (M);
+    \path [->] (L) edge node {$\epsilon$} (F);
+    \path [->] (M) edge node {$\epsilon$} (F);
+    
+    \path [->] (F) edge node {$\epsilon$} (G);
+    \path [->] (F) edge node {$\epsilon$} (I);
+    \path [->] (G) edge node {a} (H);
+    \path [->] (I) edge node {c} (J);
+    \path [->] (H) edge node {b} (N);
+    \path [->] (J) edge node {d} (O);
+    \path [->] (N) edge node {$\epsilon$} (K);
+    \path [->] (O) edge node {$\epsilon$} (K);
+    
+    \path [->] (K) edge [bend right = 70] node {$\epsilon$} (F);
+    \path [->] (F) edge [bend right = 70] node {$\epsilon$} (K);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+We could optimize this even further, but not really needed.
+Additionally to see without any optimizations and for a step-by-step, you can see Appendix B (//TODO). 
+
+\section{NFA to DFA}
+Now that we know how to convert from a regular expression to a NFA, we should talk about to how to convert from a NFA to a DFA. The reason being is that checking for acceptance on an NFA can be really costly and typically you will be calling \texttt{accept} multiple times on a machine. So instead of calling \texttt{nfa-accept} $n$ times, which is a costly operation, you should convert the NFA to a DFA (which is still costly, but done once), so you can then call \texttt{dfa-accept} $n$ times which is a very cheap operation.
+
+So lets start out by considering the difficulty of \texttt{nfa-accept}. Consider the following NFA:
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S1$};
+    \node (C) at (4,0) {$S2$};
+    \node[double] (D) at (6,0) {$S3$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \draw[very thick,->,shorten >=1pt] (A) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {a,b} (A);
+    \path [->] (A) edge node {a} (B); 
+    \path [->] (B) edge node {b} (C);
+    \path [->] (C) edge node {b} (D);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+When we want to check acceptance, we need find all possible paths and check if at least one accepts it. 
+That is when checking if the machine accepts \texttt{"aabb"}, we need to check all of the following paths:
+\begin{center}
+    \texttt{S0 -a-> S1 -a-> Garbage}\\
+    \texttt{S0 -a-> S0 -a-> S0 -b-> S0 -b-> S0}\\
+    \texttt{S0 -a-> S0 -a-> S1 -b-> S2 -b-> S3}
+\end{center}
+
+Then since one of them ends in the accepting state, then we can say this machine accepts this string. 
+Notice that we are essentially doing a depth-first-search here which can be terrible if we got an NFA that has a Kleene closure because we get an infinite depth.
+Additionally, the crux of the problem is that we have no idea which state I am in when I first see the \texttt{"a"}. I could either go from \texttt{S0 -a-> S0} or I could go from \texttt{S0 -a-> S1}. This uncertainty is what makes an NFA non-deterministic. The solution here is to create a new state which represents this uncertainty. 
+
+To demonstrate this idea, let's add a state that says "I don't know if I am in state $S0$ or $S1$". Notice this will only happen when we start by looking for an \texttt{"a"}. Additionally, when we start with a \texttt{"b"}, we know that we have to stay in state $S0$ (that is, if we are in state $S0$ and see a \texttt{"b"}, we can only go to $S0$. There is no uncertainty here. But if we are in state $S0$ and see a \texttt{"a"}, we could be in $S0$ or $S1$). 
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S0,S1$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \draw[very thick,->,shorten >=1pt] (A) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {b} (A);
+    \path [->] (A) edge node {a} (B);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+Now while we have a new state that shows possible states I could be in after seeing a \texttt{"a"}, I then need to figure out what to do next. That is, if I am in this new state $S0,S1$, then what happens if I see a \texttt{"a"} or a \texttt{"b"}? 
+
+If this state shows where I could possibly be, then we need to consider both possibilities \footnote{In "laymen's" terms, we are in quantum superposition, that is we are in both $S0$ and $S1$ at the same time}. So going back to the original NFA, if I am in state $S0$ and see a \texttt{"a"}, I could go to state $S0$ or $S1$. Additionally, (looking at the original NFA), if I am in state $S1$ and I see a \texttt{"a"}, then I can't go anywhere but the garbage state. So not including the garbage state, we can say that regardless of being in $S0$ or $S1$, if I see an \texttt{"a"}, then I have to either be in state $S0$ or $S1$. Well we already have a state that represents this possibility so we can just add the following transition: 
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S0,S1$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \draw[very thick,->,shorten >=1pt] (A) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {b} (A);
+    \path [->] (A) edge node {a} (B);
+    \draw[very thick,->,shorten >=1pt] (B) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {a} (B);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+If this is confusing, consider the following logical argument: 
+\begin{center}
+    $\begin{array}{rl}
+         & p \Rightarrow q \\
+         & s \Rightarrow r \\
+         & p \lor s\\\hline
+         \therefore & q \lor r
+    \end{array}$
+\end{center}
+From CMSC250 we know this is a valid logical argument (known as constructive dilemma). The same applies here. If $S0$ and \texttt{"a"} leads to $S0$ and $S1$, and $S1$ and \texttt{"a"} leads nowhere (except the garbage state) then we will and up in either $S0$ or $S1$ (or the garbage state). 
+\begin{center}
+    $\begin{array}{rl}
+         & S0 \Rightarrow \{S0,S1\} \\
+         & S1 \Rightarrow \emptyset \\
+         & S0 \lor S1\\\hline
+         \therefore & \{S0,S1\} \cup \emptyset = \{S0,S1\}
+    \end{array}$
+\end{center}
+
+Anyway, that was a slight sidetrack. We next need to consider if we are in $S0,S1$ and we see a \texttt{"b"}. The above logic applies. If I am in state $S0$ and see a \texttt{b} (looking at the original NFA), then I will end up in state $S0$. If I am in state $S1$ of the original NFA and see a \texttt{b}, then I will end up in state $S2$. It is uncertain which state I will be in though so let's add a new state that represents being in $S0$ or $S2$. 
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S0,S1$};
+    \node (C) at (4,0) {$S0, S2$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \draw[very thick,->,shorten >=1pt] (A) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {b} (A);
+    \path [->] (A) edge node {a} (B);
+    \draw[very thick,->,shorten >=1pt] (B) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {a} (B);
+    \path [->] (B) edge node {b} (C);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+But now the issue continues, if I am in state $S0,S2$, and see a symbol, I do not know where I should go. SO let's continue with considering if I was in $S0$ or $S2$ and seeing either a \texttt{"a"} or a \texttt{"b"}. 
+
+If I am in state $S0$ and see a \texttt{"a"}, then I am either in $S0$ or $S1$. If I am in state $S2$ and see a \texttt{"a"}, then I can go nowhere (except the garbage state). So if I am in either state $S0$ or $S2$ and see a \texttt{"a"}, then I will end up in either $S0$ or $S1$ (or garbage). Let us add this transition. 
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S0,S1$};
+    \node (C) at (4,0) {$S0, S2$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \draw[very thick,->,shorten >=1pt] (A) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {b} (A);
+    \path [->] (A) edge node {a} (B);
+    \draw[very thick,->,shorten >=1pt] (B) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {a} (B);
+    \path [->] (B) edge [bend right] node {b} (C);
+    \path [->] (C) edge [bend right] node {a} (B);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+Now if I am in state $S0$ and see a \texttt{"b"} then I can only go to state $S0$. If I am in state $S2$ and see a \texttt{"b"}, then I can only go to state $S3$. So if I am in either state $S0$ or $S2$, then I will end up in either $S0$ or $S3$. Here is another place of uncertainly so let us add this new state with transition.
+
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S0,S1$};
+    \node (C) at (4,0) {$S0, S2$};
+    \node (D) at (6,0) {$S0, S3$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \draw[very thick,->,shorten >=1pt] (A) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {b} (A);
+    \path [->] (A) edge node {a} (B);
+    \draw[very thick,->,shorten >=1pt] (B) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {a} (B);
+    \path [->] (B) edge [bend right] node {b} (C);
+    \path [->] (C) edge [bend right] node {a} (B);
+    \path [->] (C) edge node {b} (D);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+Again, the same issue arises. If I am in state $S0,S3$, what happens if I see a \texttt{"a"} or \texttt{"b"}?
+Well we will have to calculate this like we did with the other states. 
+
+If I am in state $S0$ and see a \texttt{"a"}, then I could either be in $S0$ or $S1$. If I am in state $S3$ and see a \texttt{"a"}, then I can go nowhere (except a trash state). So if I am in either state $S0$ or $S1$, then I can only end up in $S0$ or $S1$. Let us add this transition. 
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S0,S1$};
+    \node (C) at (4,0) {$S0, S2$};
+    \node (D) at (6,0) {$S0, S3$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \draw[very thick,->,shorten >=1pt] (A) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {b} (A);
+    \path [->] (A) edge node {a} (B);
+    \draw[very thick,->,shorten >=1pt] (B) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {a} (B);
+    \path [->] (B) edge [bend right] node {b} (C);
+    \path [->] (C) edge [bend right] node {a} (B);
+    \path [->] (C) edge node {b} (D);
+    \path [->] (D) edge [bend left=60] node {a} (B);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+Now if I am in state $S0$ and see a \texttt{"b"} then I can only go to state $S0$. If I am instate $S3$ and see a \texttt{"b"}, then I cannot go anywhere (except garbage). So if I am in state $S0$ or $S3$, if I see a \texttt{"b"}, I can only really go to $S0$. So let us add this transition:
+
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S0,S1$};
+    \node (C) at (4,0) {$S0, S2$};
+    \node (D) at (6,0) {$S0, S3$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \draw[very thick,->,shorten >=1pt] (A) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {b} (A);
+    \path [->] (A) edge node {a} (B);
+    \draw[very thick,->,shorten >=1pt] (B) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {a} (B);
+    \path [->] (B) edge [bend right] node {b} (C);
+    \path [->] (C) edge [bend right] node {a} (B);
+    \path [->] (C) edge node {b} (D);
+    \path [->] (D) edge [bend left=60] node {a} (B);
+    \path [->] (D) edge [bend right=70] node {b} (A);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+Now notice that this time around, we did not add any new states and we know where we want to go from each state. That is, there is no $\epsilon$-transitions, and no state has multiple outgoing edges on the same symbol. By not having these two things, we have created a DFA from our initial NFA. There is just one final step: which states should be our accepting states? If the whole thing is based on possibility being in a state, then it should follow that any state which represents a possible accepting state should in turn, be an accepting state. In our original NFA, $S3$ was the only accepting state, so we look at all states of this DFA and mark any state which represents the possibility of being in $S3$ as an accepting state. 
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S0,S1$};
+    \node (C) at (4,0) {$S0, S2$};
+    \node (D)[double] at (6,0) {$S0, S3$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \draw[very thick,->,shorten >=1pt] (A) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {b} (A);
+    \path [->] (A) edge node {a} (B);
+    \draw[very thick,->,shorten >=1pt] (B) to [out=112.5,in=67.5,loop,looseness=4.8] node [above] {a} (B);
+    \path [->] (B) edge [bend right] node {b} (C);
+    \path [->] (C) edge [bend right] node {a} (B);
+    \path [->] (C) edge node {b} (D);
+    \path [->] (D) edge [bend left=60] node {a} (B);
+    \path [->] (D) edge [bend right=70] node {b} (A);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+If you also go back a few pages, this machine is identical to the DFA we said corresponded to our NFA. Wild. 
+
+\subsection{NFA To DFA Algorithm}
+So let us convert what we just did to an algorithm.
+
+To do so, we will need to define 2 subroutines: \texttt{$\epsilon$-closure} and \texttt{move} as well as define our NFA.
+Let us use the same FSM definition we have been using: ($\Sigma,S, s_0, F, \delta$).
+Let us give some types as well:
+\begin{itemize}
+    \item $\Sigma$: \texttt{'a list}, a list of symbols
+    \item $S$: \texttt{'b list}, a list of states
+    \item $s_0$: \texttt{'b}, a singe state ($s_0 \in S$)
+    \item $F$: \texttt{'b list}, a list of state we should accept ($F \subseteq S$)
+    \item $\delta$: \texttt{('b * 'a * 'b) list}, a list of transitions from one state to another, (\texttt{(source, symbol, destination)}).
+\end{itemize}
+
+\subsubsection{$\epsilon$-Closure}
+Now to our functions. Recall that we want to figure out which states can be grouped together. 
+\texttt{$\epsilon$}-closure is a function that helps figure this out in terms of $\epsilon$-transitions. The previous example did not have any $\epsilon$-transitions but consider: 
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S1$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \path [->] (A) edge node {$\epsilon$} (B);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+If I am in state $S0$, I could also possibly be in state $S1$ as well. So $\epsilon$-closure if a function that helps us figure out where can we go using only $\epsilon$-transitions. Now the term closure should give us a hint as to what we want to do. We want to figure out what states are closed upon $\epsilon$-transitions. It is important to note that any state can reach itself via an $\epsilon$-transition. So here is the type of $\epsilon$-closure:
+\begin{itemize}
+    \item \texttt{e-closure: (NFA -> 'b list -> 'b list)}, given a list of states, return a list of states reachable using only $\epsilon$-transitions
+\end{itemize}
+
+To see an example, let us consider the following machine: 
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S1$};
+    \node (C) at (4,0) {$S3$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \path [->] (A) edge node {$\epsilon$} (B);
+    \path [->] (B) edge node {$\epsilon$} (C);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+If I were to call \texttt{$\epsilon$-closure nfa [S0]} I should get back \texttt{[S0;S1;S2]}. The best way to do so is by iterating through $\delta$ and checking where you can go to anywhere in the input list. Then recursively calling $\epsilon$-closure on the resulting list. That is:
+\begin{lstlisting}
+e-closure nfa [S0]
+// Looking at S0 I can only go to S0 and S1 via an epsilon transition
+[S0;S1]
+// looking at S0 I can go to S0 and S1, looking at S1 I can go to S1 and S2
+[S0;S1;S2]
+// looking at S0 I can go to S0 and S1, looking at S1 I can do to S1 and S2, 
+// looking at S2 I can go to S2
+[S0;S1;S2]
+// I got no new states, my output matches my input, I am done
+\end{lstlisting}
+
+Here since, my output matches my output then I can return this list and be done. This type of algorithm is called a fixed point algorithm. 
+
+The actual pseudocode is something like: 
+\begin{lstlisting}
+NFA = (alphabet, states,start,finals,transitions)
+e-closure(s)
+  x = s
+  do
+    s= x
+    x = union(s,{dest|(src in s) and (src,e,dest) in transitions})
+  while s!= x
+  return x
+\end{lstlisting}
+
+On the other hand, \texttt{move} is going to just see where you can do based on a starting state and a symbol. It's type is
+\begin{itemize}
+    \item \texttt{move: (NFA -> 'a -> 'b  -> 'b list)}, given a state and a symbol, return a list of states I could end up in.
+\end{itemize}
+
+It is important to note that you should not perform $\epsilon$-closure at any point during a move. For an example, consider the following machine: 
+\begin{center}
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+    \node (A) at (0,0) {$S0$};
+    \node (B) at (2,0) {$S1$};
+    \node (C) at (4,0) {$S2$};
+    \node (D) at (0,-2) {$S3$};
+\end{scope}
+\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,rectangle},
+              every edge/.style={draw=black,very thick}]
+    \draw[very thick, ->] (-1,1) -- (A);
+    \path [->] (A) edge node {$\epsilon$} (B);
+    \path [->] (A) edge node {a} (D);
+    \path [->] (B) edge node {a} (C);
+    \path [->] (D) edge node {a} (B);
+    \path [->] (D) edge node {a} (C);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+If we were to call \texttt{move "a" S0}, then we should get back \texttt{[S3]}. Yet if we were to call \texttt{move "a" S3} we should get back \texttt{[S1;S2]}. This one is pretty straightforward. Just iterate through $\delta$ to figure out what your resulting list should be. 
+
+\subsubsection{NFA to DFA Pseudocode}
+
+Now that we have everything defined, need to take the process we had and create an algorithm. 
+Going back to the NFA to DFA example, on each step we had to figure out where we could be upon each symbol in the alphabet. So our pseudocode should look like: 
+\begin{lstlisting}
+NFA = (a, states, start,finals,transitions)
+DFA = (a, states, start,finals,transitions)
+visited = []
+let DFA.start = e-closure(start), add to DFA.states 
+while visited != DFA.states
+  add an unvisited state, s, to visited
+  for each char in a
+    E = move(s)
+    e = e-closure(E)
+    if e not in DFA.states
+      add e to DFA.states
+    add (s,char,e) to DFA.transitions
+DFA.final = {r| s \in r and s \in NFA.final}
+\end{lstlisting}
+
+For a full in-depth example, see Appendix C //TODO
+\section{DFA to Regex}
+\end{document}

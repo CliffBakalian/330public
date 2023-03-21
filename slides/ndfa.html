@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>CMSC330 - NFA and DFA</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/white.css" id="theme">
+		<link rel="stylesheet" href="plugin/highlight/stackoverflow.css">
+
+		<link rel="stylesheet" href="dist/mystyle.css"> 
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-auto-animate data-auto-animate-unmatched="fade-up">
+          <h1>CMSC330</h1>
+          <h3>NFA and DFA</h3>
+				</section>
+
+				<section data-auto-animate class='fixvert'style="height: 600px">
+					<h3>NFA and DFA</h3>
+					<div class='fragment tl-diamond' data-fragment-index="1" data-id="1" style="background:purple;top:100px;"></div>
+          <div class='fragment tl-data' data-fragment-index="1" style="top:93px;">NFA and DFA</div>
+
+					<div class='fragment tl' data-fragment-index="2" style="top:140px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="2" data-id="2" style="background:blue;top:180px;"></div>
+					<div class='fragment tl-data' data-fragment-index="2" style="top:173px;">Regex to NFA</div>
+
+					<div class='fragment tl' data-fragment-index="3" style="top:220px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="3" data-id="3" style="background:green;top:260px;"></div>
+					<div class='fragment tl-data' data-fragment-index="3" style="top:253px;">NFA to DFA</div>
+
+					<div class='fragment tl' data-fragment-index="4" style="top:300px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="4" data-id="4" style="background:cyan;top:340px;"></div>
+					<div class='fragment tl-data' data-fragment-index="4" style="top:333px;">DFA to Regex</div>
+				</section>
+
+				<section data-auto-animate class='fixvert' style="height:600px;">
+					<h3>NFA and DFA</h3>
+					<div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+        </section>
+
+				<section data-auto-animate style="height:600px;">
+					<h3>NFA and DFA</h3>
+					<div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+          <section data-auto-animate>
+            <p class='fragment fade-up'>So far we have only really looked at DFAs</p>
+            <p class='fragment fade-up'>DFA: Deterministic Finite Automata</p>
+            <p class='fragment fade-up'>Easy to check regex acceptance</p>
+            <p class='fragment fade-up'>But machines hard to create</p>
+          </section>
+          <section data-auto-animate>
+            <p>But machines hard to create</p>
+            <p class='fragment fade-up'>Here is <tt>/(a|b)*abb/</tt>'s DFA</p>
+            <img class='fragment' src='dist/assets/ndfa/f1.png'></img>
+            <p class='fragment fade-up'>We can create NFA much easier</p>
+          </section>
+          <section data-auto-animate>
+            <p >We can create NFA much easier</p>
+            <p class='fragment fade-up'>NFA: Nondeterministic Finite Automata</p>
+            <p class='fragment fade-up'>Harder to check regex acceptance</p>
+            <p class='fragment fade-up'>Machine easier to make</p>
+          </section>
+          <section data-auto-animate>
+            <p>Machine easier to make</p>
+            <p class='fragment fade-up'>Here is <tt>/(a|b)*abb/</tt>'s NFA</p>
+            <img class='fragment' src='dist/assets/ndfa/f2.png'></img>
+          </section>
+          <section data-auto-animate>
+            <img src='dist/assets/ndfa/f2.png'></img>
+            <ul>
+              <li class='fragment fade-up'>Multiple transitions on same symbols</li>
+              <ul>
+                <li class='fragment fade-up'>Many ways to accept</li>
+              </ul>
+              <li class='fragment fade-up'>Can have epislon (\(\epsilon\)) transitions</li>
+            </ul>
+          </section>
+          <section data-auto-animate>
+            <img src='dist/assets/ndfa/f3.png'></img>
+            <img class='fragment fade-up' src='dist/assets/ndfa/f4.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>First: define a FSM</p>
+          <ul>
+          <li class='fragment fade-up'>Alphabet (\(\sum\))</li>
+          <li class='fragment fade-up'>Set of States (\(Q\))</li>
+          <li class='fragment fade-up'>Start State (\(q_0 \in Q\))</li>
+          <li class='fragment fade-up'>Final States (\(F \subseteq Q\))</li>
+          <li class='fragment fade-up'>DFA Transitions (\(\delta: Q \times \sum \mapsto Q\))</li>
+          <li class='fragment fade-up'>NFA Transitions (\(\delta: Q \times (\sum \cup \{\epsilon\}) \mapsto Q\))</li>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <p>Accepting with DFA is easy</p>
+          <img class='fragment fade-up' src='dist/assets/ndfa/f3.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Accepting with NFA is hard</p>
+          <img class='fragment fade-up' src='dist/assets/ndfa/f2.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Accepting with DFA is easy</p>
+          <p>Accepting with NFA is hard</p>
+          <p class='fragment fade-up'>Good news: can convert between NFA and DFA</p>
+          <p class='fragment fade-up'>with the help of regex</p>
+          <p class='fragment fade-up'>All DFAs are NFAs</p>
+          <img class='fragment fade-up' style='height:180px;'src='dist/assets/ndfa/c0.png'></img>
+          </section>
+        </section>
+
+				<section data-auto-animate style="height:600px">
+					<h3>Regex to NFA</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="background:blue;bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+          <section data-auto-animate>
+          <p>NFAs are easy to build: start here</p>
+          <p class='fragment fade-up'>Regex to NFA is dependent on what we need for Regex</p>
+          <ul>
+          <li class='fragment fade-up'>Alphabet</li>
+          <li class='fragment fade-up'>Concatenation</li>
+          <li class='fragment fade-up'>Union</li>
+          <li class='fragment fade-up'>Kleene Closure</li>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <p>\(\emptyset\): The language is null</p>
+          <img class='fragment fade-up' src='dist/assets/ndfa/f5.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>\(\epsilon\): empty string</p>
+          <img class='fragment fade-up' src='dist/assets/ndfa/f6.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>\(\sigma\): A letter in the alphabet</p>
+          <img class='fragment fade-up' src='dist/assets/ndfa/f7.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Concatenation: \(\{xy\vert x \in L_1 \land y \in L_2\}\)</p>
+          <img class='fragment fade-up' src='dist/assets/ndfa/f8.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Concatenation: \(\{xy\vert x \in L_1 \land y \in L_2\}\)</p>
+          <img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/ndfa/f9.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Union: \(\{x\vert x \in L_1 \lor x \in L_2\}\)</p>
+          <img class='fragment fade-up' src='dist/assets/ndfa/f10.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Union: \(\{x\vert x \in L_1 \lor x \in L_2\}\)</p>
+          <img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/ndfa/f11.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Kleene Closure: \(\{x\vert x \in \{\epsilon\} \lor x \in L_1 \lor x \in L_1L_1 \lor \dots\}\)</p>
+          <img class='fragment fade-up' src='dist/assets/ndfa/f12.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Kleene Closure: \(\{x\vert x \in \{\epsilon\} \lor x \in L_1 \lor x \in L_1L_1 \lor \dots\}\)</p>
+          <img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/ndfa/f13.png'></img>
+          </section>
+        </section>
+
+				<section data-auto-animate style="height:600px">
+					<h3>NFA to DFA</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="background:green;bottom:-30px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-50px;"></div>
+          <section data-auto-animate>
+          <p>NFAs: hard to check acceptance</p>
+          <p class='fragment fade-up'>DFAs: easy to check acceptance</p>
+          <p class='fragment fade-up'>Convert from NFA to DFA</p>
+          <p class='fragment fade-up'>Basis: combine states to represent possible NFA states</p>
+          <p class='fragment fade-up'>(ie. Make a state that represents "could be in S1 or S2")</p>
+          </section>
+          <section data-auto-animate>
+          <p>Basis: combine states to represent possible NFA states</p>
+          <p class='fragment fade-up'>Subset Algorithm</p>
+          <p class='fragment fade-up'>Requires two Functions:</p>
+          <ul>
+          <li class='fragment fade-up'>\(\epsilon\)-closure</li>
+          <li class='fragment fade-up'>Move</li>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <p>Basis: combine states to represent possible NFA states</p>
+          <p >Subset Algorithm</p>
+          <p >Requires two Functions:</p>
+          <ul>
+          <li>\(\epsilon\)-closure</li>
+          <ul>
+          <li class='fragment fade-up'>Which states can I get to using only \(\epsilon\) transitions</li>
+          <li class='fragment fade-up'>Can always reach self</li>
+          </ul>
+          <li>Move</li>
+          <ul>
+          <li class='fragment fade-up'>Which states can I get to using one symbol transition</li>
+          <li class='fragment fade-up'>Could be none</li>
+          </ul>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <p>\(\epsilon\)-closure</p>
+          <img class='fragment fade-up' src='dist/assets/ndfa/f14.png'></img>
+          <p data-id="6">Reached: S0</p>
+          </section>
+          <section data-auto-animate>
+          <p>\(\epsilon\)-closure</p>
+          <img  src='dist/assets/ndfa/f14.png'></img>
+          <p data-id="6" data-auto-animate-unmatched=false data-auto-animate-duration=0>Reached: S0,S1</p>
+          </section>
+          <section data-auto-animate>
+          <p>\(\epsilon\)-closure</p>
+          <img  src='dist/assets/ndfa/f14.png'></img>
+          <p data-id="6" data-auto-animate-unmatched=false data-auto-animate-duration=0>Reached: S0,S1,S2</p>
+          </section>
+          <section data-auto-animate>
+          <p>\(\epsilon\)-closure</p>
+          <img  src='dist/assets/ndfa/f14.png'></img>
+          <p data-id="6" data-auto-animate-unmatched=false data-auto-animate-duration=0>ReachedL S0,S1,S2,S3</p>
+          </section>
+          <section data-auto-animate>
+          <p>\(\epsilon\)-closure</p>
+          <pre style='width:900px'><code class='fragment' data-trim>
+NFA = (alphabet, states,start,finals,transitions)
+e-closure(s)
+  x = s
+  do
+    s= x
+    x = union(s,{dest|src \in sand (src,e,dest) in transitions})
+  while s!= x
+  return x
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <p>Move</p>
+          <img class='fragment fade-up' src='dist/assets/ndfa/f14.png'></img>
+          <p class='fragment fade-up'  data-id="6">Reached: S1</p>
+          </section>
+          <section data-auto-animate>
+          <p>Move</p>
+          <img  src='dist/assets/ndfa/f14.png'></img>
+          <p data-id="6" data-auto-animate-unmatched=false data-auto-animate-duration=0>Reached S1,S4</p>
+          </section>
+          <section data-auto-animate>
+          <p>Move</p>
+          <img  src='dist/assets/ndfa/f14.png'></img>
+          <p data-id="6" data-auto-animate-unmatched=false data-auto-animate-duration=0>Reached S1,S4,S5</p>
+          </section>
+          <section data-auto-animate>
+          <p>Move</p>
+          <img  src='dist/assets/ndfa/f14.png'></img>
+          <p data-id="6" data-auto-animate-unmatched=false data-auto-animate-duration=0>Reached S1,S4,S5</p>
+          <p class='fragment fade-up'>Just go through transition list</p>
+          </section>
+          <section data-auto-animate>
+          <p>Putting it all together</p>
+          <pre style='width:900px'><code class='fragment' data-trim>
+NFA = (a, states, start,finals,transitions)
+DFA = (a, states, start,finals,transitions)
+visited = []
+let DFA.start = e-closure(start), add to DFA.states 
+while visited != DFA.states
+  add an unvisited state, s, to visited
+  for each char in a
+    E = move(s)
+    e = e-closure(E)
+    if e not in DFA.states
+      add e to DFA.states
+    add (s,char,e) DFA.transitions
+DFA.final = {r| s \in r and s \in NFA.final} 
+          </code></pre>
+          </section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/0.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/1.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/2.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/3.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/4.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/5.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/6.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/7.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/8.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/9.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/10.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/11.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/12.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/13.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/14.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/15.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/16.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/17.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/18.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/19.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/20.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/21.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/22.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/23.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/24.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/25.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/26.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/27.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/28.svg'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/nd/29.svg'></img></section>
+        </section>
+
+				<section data-auto-animate style="height:600px">
+					<h3>DFA to Regex</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+					<div class='tl-circle' data-id="3" style="background:cyan;bottom:-50px;"></div>
+          <section data-auto-animate>
+          <p>Regex\(\Rightarrow\)NFA\(\Rightarrow\)DFA</p>
+          <p class='fragment fade-up'>Time for DFA\(\Rightarrow\)Regex</p>
+          <p class='fragment fade-up'>Idea: remove states and replace with Regex</p>
+          <p class='fragment fade-up'>Each state has 3 parts: incoming,self, outgoing</p>
+          <p class='fragment fade-up'>Regex added in that order</p>
+          </section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/dtr/c0-c.png'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/dtr/c1-c.png'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/dtr/c2-c.png'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/dtr/c3-c.png'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/dtr/c8-c.png'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/dtr/c9-c.png'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/dtr/c4-c.png'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/dtr/c5-c.png'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/dtr/c6-c.png'></img></section>
+<section data-auto-animate><img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/dtr/c7-c.png'></img>
+<p class='fragment fade-up'>Note: This is incomplete</p></section>
+        </section>
+      </div>
+		</div>
+
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/math/math.js"></script>
+    <script src="plugin/search/search.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+    <script src="canvas/shapes.js"></script>
+    <script src="canvas/initShapes.js"></script>
+		<script>
+     Reveal.configure({
+        keyboard: {
+          40: 'next', // go to the next slide with down arrow
+          38: 'prev', // go to the next slide with up arrow
+        }
+      });
+			Reveal.initialize({
+				center: true,
+				hash: true,
+        controlsTutorial: false,
+        showSlideNumber: 'print',
+        pdfSeparateFragments: false,
+				math: {
+					// mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+					config: 'TeX-AMS_HTML-full',
+					TeX: {
+						Macros: {
+							R: '\\mathbb{R}',
+							set: [ '\\left\\{#1 \\; ; \\; #2\\right\\}', 2 ]
+						}
+					}
+				},
+				plugins: [ RevealHighlight, RevealMarkdown, RevealMath, RevealSearch, RevealZoom ]
+
+			});
+		</script>
+	</body>
+</html>

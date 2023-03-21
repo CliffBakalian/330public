@@ -1,0 +1,9 @@
+# Please Read
+
+Here is the public repo for notes and slides for CMSC330. 
+
+This will not be updated regularalry since this is more for mirroring the content found at [https://bakalian.cs.umd.edu](https://bakalian.cs.umd.edu).
+
+The notes are tex files which you can be compiled using `pdflatex` should it be installed. The PDFs otherwise may be a little out of date. 
+
+The slides are self hosting and you can open each `html` file in your web browser. They should theoretically work in any browser but have only been tested on Firefox.

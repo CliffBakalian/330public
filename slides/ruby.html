@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>CMSC330 - Ruby</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- INSERT DJANGO CSS -->
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/white.css" id="theme">
+		<link rel="stylesheet" href="plugin/highlight/stackoverflow.css">
+		<link rel="stylesheet" href="dist/mystyle.css"> 
+    <!-- INSERT DJANGO CSS -->
+
+	</head>
+
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-auto-animate data-auto-animate-unmatched="fade-up">
+          <h1>CMSC330</h1>
+          <h3>Ruby</h3>
+				</section>
+
+				<section data-auto-animate class='fixvert'style="height: 600px">
+					<h3>Ruby</h3>
+					<div class='fragment tl-diamond' data-fragment-index="1" data-id="1" style="background:purple;top:100px;"></div>
+					<div class='fragment tl-data' data-fragment-index="1" style="top:93px;">Intro</div>
+
+					<div class='fragment tl' data-fragment-index="2" style="top:140px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="2" data-id="2" style="background:blue;top:180px;"></div>
+					<div class='fragment tl-data' data-fragment-index="2" style="top:173px;">Typing</div>
+
+					<div class='fragment tl' data-fragment-index="3" style="top:220px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="3" data-id="3" style="background:green;top:260px;"></div>
+					<div class='fragment tl-data' data-fragment-index="3" style="top:253px;">Object Orientation</div>
+
+					<div class='fragment tl' data-fragment-index="4" style="top:300px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="4" data-id="4" style="background:orange;top:340px;"></div>
+					<div class='fragment tl-data' data-fragment-index="4" style="top:333px;">Data Types and Syntax</div>
+				</section>
+
+				<section data-auto-animate class='fixvert' style="height:600px;">
+					<h3>Intro</h3>
+					<div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+        </section>
+				<section data-auto-animate style="height:600px;">
+					<h3>Intro</h3>
+					<div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+          <section data-auto-animate>
+          <h5>Our First Program</h5>
+          <pre style='width:400px'><code data-line-numbers># hello_world.rb
+puts "Hello, World!"
+          </code></pre>
+          <ul>
+            <li class='fragment fade-up'>Comments use #</li>
+            <li class='fragment fade-up'>no semicolons needed</li>
+            <li class='fragment fade-up'><tt>puts</tt> to print</li>
+          </ul>
+          <pre style='width:400px'><code class='fragment'>ruby hello_world.rb
+          </code></pre>
+          </section>
+        </section>
+
+				<section data-auto-animate style="height:600px">
+					<h3>Typing</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="background:blue;bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+          <section data-auto-animate>
+          <h5>Our Second Program</h5>
+          <pre style='width:400px'><code data-line-numbers># typing.rb
+y = "hello"
+y = 3
+z = 4
+puts y + z
+          </code></pre>
+          <pre style='width:400px'><code class='fragment'>ruby typing.rb
+          </code></pre>
+          <ul>
+            <li class='fragment fade-up'>No error?</li>
+            <li class='fragment fade-up'>No variable type?</li>
+          </ul>
+          <p class='fragment fade-up'>Ruby uses dynamic and latent typing</p>
+          </section>
+
+          <section data-auto-animate>
+          <h5>Type Checking</h5>
+          <p>Type Checking: The process of determining a variable's type</p>
+          <p class='fragment fade-up'>Dynamic typing: type checking is performed at run-time</p>
+          <p class='fragment fade-up'>Static typing: type checking is performed at compile-time</p>
+          </section>
+
+          <section data-auto-animate>
+          <h5>Typing</h5>
+          <p>Manifest (explicit) typing: explicitly telling the compiler the type of new variables</p>
+          <p class='fragment fade-up'>Types are associated with variables</p>
+          <p class='fragment fade-up'>Latent (implicit) typing: not needing to give a type to a variable</p>
+          <p class='fragment fade-up'>Types are associated with values</p>
+          </section>
+        </section>
+
+				<section data-auto-animate style="height:600px">
+					<h3>Object Oriented Programming</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="background:green;bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+          <section data-auto-animate>
+          <p>Everything is a class</p>
+          <pre style='width:400px'><code class='fragment' data-line-numbers>a = "Hello"
+a.class
+          </code></pre>
+          <p class='fragment fade-up'>Including Primitives</p>
+          <pre style='width:400px'><code class='fragment' data-line-numbers>3.class
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <p>Objects have methods</p>
+          <pre style='width:400px'><code class='fragment' data-line-numbers>3.methods</code></pre>
+          <p class='fragment fade-up'>Even Ruby's equivalent to Java's Null</p>
+          <pre style='width:400px'><code class='fragment' data-line-numbers>puts nil.to_s</code></pre>
+          </section>
+          <section data-auto-animate>
+          <p>Reminders about Object Oriented Programming</p>
+          <p class='fragment fade-up'>Values are references to Objects</p>
+          <p class='fragment fade-up'>Objects are instances of Classes</p>
+          <p class='fragment fade-up'>Classes inherit from each other</p>
+          </section>
+          <section data-auto-animate>
+          <h5>Class Creation</h5>
+          <pre style='width:400px'><code class='fragment' data-id=5 data-line-numbers=|1,9|2-4|3,7|11|>class Square
+  def initialize(size)
+    @size = size
+  end
+
+  def area
+    @size*@size
+  end
+end 
+
+s = Square.new(5)
+puts s.area
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>Class Creation</h5>
+<div class='container'>
+  <div style='width:50%'>
+          <pre style='width:400px'><code data-id=5 data-line-numbers>class Square
+  def initialize(size)
+    @size = size
+  end
+
+  def area
+    @size*@size
+  end
+end 
+
+s = Square.new(5)
+puts s.area
+          </code></pre>
+  </div>
+  <div style='width:50%'>
+          <pre style='height:450px;width:600px'><code data-line-numbers=|2|>public class Square{
+  private int size;
+  public Square(size){
+    this.size = size;
+  } 
+
+  public int area(){
+    return size*size;
+  }
+} 
+
+public static void main(String[] args){
+  Square s = new Square(5);
+  System.out.println(s.area);
+}
+          </code></pre>
+  </div>
+</div>
+          </section>
+          <section data-auto-animate>
+          <p>Things to Note</p>
+          <p class='fragment fade-up'>Instance variables are private by default</p>
+          <p class='fragment fade-up'>last line in a method is returned</p>
+          <p class='fragment fade-up'>No Method Overloading</p>
+          </section>
+          <section data-auto-animate>
+          <p>Things to Note</p>
+          <p>Instance variables are private by default</p>
+          <div class=container>
+            <div style='width:33%'>
+              <pre style='height:120px;width:200px'><code data-trim data-noescape>
+              # getter
+              def x
+                @x
+              end
+              </code></pre>
+            </div>
+            <div style='width:33%'>
+              <pre style='height:120px;width:200px'><code data-trim data-noescape>
+              # setter
+              def x=(x)
+                @x=x
+              end
+              </code></pre>
+            </div>
+            <div style='width:33%'>
+              <pre style='height:120px;width:300px'><code data-trim data-noescape>
+              # instead
+              attr_accessor :x
+              </code></pre>
+            </div>
+          </div>
+          <p>last line in a method is returned</p>
+          <p>No Method Overloading</p>
+          </section>
+          <section data-auto-animate>
+          <p>Things to Note</p>
+          <p>Instance variables are private by default</p>
+          <p>last line in a method is returned</p>
+          <div class=container>
+            <div style='width:33%'>
+              <pre style='height:120px;width:250px'><code data-trim data-noescape>
+              def my_s
+                s = "to string"
+                return s
+              end
+              </code></pre>
+            </div>
+            <div style='width:33%'>
+              <pre style='height:120px;width:250px'><code data-trim data-noescape>
+              def my_s
+                s = "to string"
+                s
+              end
+              </code></pre>
+            </div>
+            <div style='width:33%'>
+              <pre style='height:120px;width:250px'><code data-trim data-noescape>
+              def my_s
+                "to string"
+              end
+              </code></pre>
+            </div>
+          </div>
+          <p>No Method Overloading</p>
+          </section>
+
+          <section data-auto-animate>
+          <p>Things to Note</p>
+          <p>Instance variables are private by default</p>
+          <p>last line in a method is returned</p>
+          <p>No Method Overloading</p>
+              <pre style='height:250px;width:250px'><code data-trim data-noescape>
+              def my_s
+                "String 1"  
+              end
+
+              def my_s
+                "string 2" 
+              end
+              puts my_s
+              </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>Fun Examples</h5>
+          <pre style='height:450px;width:600px'><code data-trim data-noescape data-line-numbers=1,2|4-16|18-24|26-36|38-43|45-50><script type="text/template">
+# objects call methods
+3.+(4)
+
+# inheritance is a thing
+class Shape
+  def to_s
+    "I am a shape" 
+  end
+end
+
+class Square < Shape
+  def to_s
+    super() + " and a square"
+  end
+end
+puts Square.new
+
+# so are class variables
+class Person
+  @@population = 0
+  def initialize
+    @@population += 1
+  end
+end
+
+# and class methods
+class Person
+  @@population = 0
+  def initialize
+    @@population += 1
+  end
+
+  def Person.amount
+    @@population
+  end
+end
+
+# you can also modify existing classes
+class Integer
+  def double
+    self+self
+  end
+end
+
+# and break ruby
+class Integer
+  def +(x)
+    puts "not today" 
+  end
+end
+          </script></code></pre>
+          </section>
+        </section>
+				<section data-auto-animate style="height:600px;">
+					<h3>Data Types and Syntax</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="background:green;bottom:-50px;"></div>
+          <section data-auto-animate>
+          <h5>Integers and Floats</h5>
+          <pre style='width:350px'><code data-trim data-noescape data-line-numbers>
+          1.class       #Integer
+          (2+3).class   #Integer
+          1.0.class     #Float
+          (1.5*2).class #Float 
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>Strings</h5>
+          <pre style='width:600px'><code data-trim data-noescape data-line-numbers>
+          "hello"
+          "hello".length
+
+          #structural equality
+          "hello" == "hello"
+
+          # can substitute variables
+          name = "cliff"
+          puts "My name is #{name}"
+
+          # can format strings
+          puts sprintf("is %s %d?","cliff",18)
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>Symbols</h5>
+          <pre style='width:450px'><code data-trim data-noescape data-line-numbers>
+          :"any_valid_string23"
+          
+          # like a string except
+          # stored differently
+
+          "structural" == "structural"
+          "physical".equal? "physical"
+
+          :structural == :structural
+          :physical.equal? :physical
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>Arrays</h5>
+          <pre style='width:470px'><code data-trim data-noescape data-line-numbers=1-3|5,6|8-11|13-16|18-26|28-33|35-41|43-48>
+          # bracket syntax
+          arr = [1,2,3,4]
+          arr = []
+
+          # can be heterogenous
+          arr = [1,"hello",3.0]
+
+          # OOP behaviour too
+          arr = Array.new
+          arr = Array.new(3)
+          arr = Array.new(3,"a")
+
+          # bracket indexing
+          arr = [1,2,3,4]
+          puts arr[1]
+          puts arr[-1]
+
+          # dynamic size
+          arr = []
+          arr[3] = 3
+          arr[5] = 6
+          puts arr
+          arr.delete_at(1)
+          puts arr
+          arr.delete(3)
+          puts arr
+
+          # multidimensional
+          a = []
+          a[0] = []
+          puts a
+          a[][] # error
+          a = Array.new(3){Array.new(3)}
+
+          # like sets
+          a = [1,2,3,4]
+          b = [4,5,6,7]
+          puts a+b
+          puts a|b
+          puts a&b
+          puts a-b
+
+          # stack and queue behaviour
+          a = [1,2,3]
+          a.push(4)
+          a.pop
+          a.unshift(0)
+          a.shift
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>Hashes</h5>
+          <pre style='width:470px'><code data-trim data-noescape data-line-numbers=1-3|5-7|9-12|14-18>
+          # Curly Brace syntax
+          h = {}
+          h = {"key"=>"value",}
+
+          # bracket indexing
+          puts h["key"]
+          h[:key2] = "value2"
+
+          # defaulting and nil
+          puts h[3] # is nil
+          h2 = Hash.new(5)
+          puts h2['a'] # is 5
+
+          # multidimensional
+          h = {}
+          h[0] = {}
+          h[0][0] = 1
+          puts h
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>Conditionals</h5>
+          <pre style='width:470px'><code data-trim data-noescape data-line-numbers=1,2|4-11|13-18|20-25>
+          puts true.class
+          puts false.class
+          
+          #syntax
+          if false
+            puts "not here"
+          elsif nil
+            puts "nor here"
+          else
+            puts "Here I am"
+          end
+
+          # while loop
+          count = 0
+          while count < 5
+            puts count
+            count += 1
+          end 
+
+          # for loop
+          # must go through an iterator
+          a = [1,2,3]
+          for value in a
+            puts value
+          end 
+          </code></pre>
+          </section>
+      </div>
+		</div>
+
+    <!-- INSERT DJANGO JAVASCRIPT -->
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/math/math.js"></script>
+    <script src="plugin/search/search.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+    <!-- INSERT DJANGO JAVASCRIPT -->
+    
+		<script>
+     Reveal.configure({
+        keyboard: {
+          40: 'next', // go to the next slide with down arrow
+          38: 'prev', // go to the next slide with up arrow
+        }
+      });
+			Reveal.initialize({
+				center: true,
+				hash: true,
+        controlsTutorial: false,
+        showSlideNumber: 'print',
+        pdfSeparateFragments: false,
+				math: {
+					// mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+					config: 'TeX-AMS_HTML-full',
+					TeX: {
+						Macros: {
+							R: '\\mathbb{R}',
+							set: [ '\\left\\{#1 \\; ; \\; #2\\right\\}', 2 ]
+						}
+					}
+				},
+				plugins: [ RevealHighlight, RevealMarkdown, RevealMath, RevealSearch, RevealZoom ]
+
+			});
+		</script>
+	</body>
+</html>

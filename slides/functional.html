@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>CMSC330 - Functional Programming</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/white.css" id="theme">
+		<link rel="stylesheet" href="plugin/highlight/stackoverflow.css">
+
+		<link rel="stylesheet" href="dist/mystyle.css"> 
+	</head>
+
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-auto-animate data-auto-animate-unmatched="fade-up">
+          <h1>CMSC330</h1>
+          <h3>Functional Programming</h3>
+				</section>
+
+				<section data-auto-animate class='fixvert'style="height: 600px">
+					<h3>Functional Programming</h3>
+					<div class='fragment tl-diamond' data-fragment-index="1" data-id="1" style="background:purple;top:100px;"></div>
+					<div class='fragment tl-data' data-fragment-index="1" style="top:93px;">Currying</div>
+
+					<div class='fragment tl' data-fragment-index="2" style="top:140px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="2" data-id="2" style="background:blue;top:180px;"></div>
+					<div class='fragment tl-data' data-fragment-index="2" style="top:173px;">Closures</div>
+
+					<div class='fragment tl' data-fragment-index="3" style="top:220px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="3" data-id="3" style="background:green;top:260px;"></div>
+					<div class='fragment tl-data' data-fragment-index="3" style="top:253px;">Tail Recursion</div>
+				</section>
+
+				<section data-auto-animate class='fixvert' style="height:600px;">
+					<h3>Currying</h3>
+					<div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+        </section>
+
+				<section data-auto-animate style="height:600px;">
+					<h3>Currying</h3>
+					<div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+          <section data-auto-animate>
+          <p>Recall Higher Order Functions</p>
+          <pre style='width:500px'><code class='fragment' data-trim >
+map (fun x -> x + 3) [1;2;3;4];;
+          </code></pre>
+          <p class='fragment fade-up'>Functions were treated like data and passed in</p>
+          <p class='fragment fade-up'>If funtions are data, we can also return them</p>
+          <pre style='width:400px'><code class='fragment' data-trim data-line-numbers>
+let add3 x = x + 3 in
+let sub3 x = x - 3 in 
+let lst = [add3;sub3] in
+match lst with 
+[]->(fun x -> x * 3)
+|h::_-> h;;
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <p class='fragment fade-up'>Recall anonymous syntactic sugar</p>
+          <pre style='width:500px'><code class='fragment' data-trim data-line-numbers>
+let add3 x = x + 3;;
+let add3 = (fun x -> x + 3);;
+          </code></pre>
+          <p class='fragment fade-up'>This works for multi-argument functions</p>
+          <pre style='width:620px'><code class='fragment' data-trim data-line-numbers>
+let sum x y = x + y;;
+let sum x = fun y -> x + y;;
+let sum = fun x -> fun y -> x + y;;
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <p >This works for multi-argument functions</p>
+          <pre style='width:620px'><code data-trim data-line-numbers>
+let sum x y = x + y;;
+let sum x = fun y -> x + y;;
+let sum = fun x -> fun y -> x + y;;
+          </code></pre>
+          <p class='fragment fade-up'>function now becomes: one input -> one output</p>
+          <p class='fragment fade-up'>Currying: process of converting a multi-argument function into a series of functions that each take one input</p>
+          </section>
+          <section data-auto-animate>
+          <p>Currying: process of converting a multi-argument function into a series of functions that each take one input</p>
+          <p class='fragment fade-up'>Why?</p>
+          <ul>
+          <li class='fragment fade-up'>Avoid Repetition/Reusability</li>
+          <li class='fragment fade-up'>Break Functions Down</li>
+          <li class='fragment fade-up'>Some languages or functions only accept functions that take in one argument</li>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <ul>
+          <li >Avoid Repetition/Reusability</li>
+          </ul>
+          <pre style='width:620px'><code data-trim data-line-numbers>
+let concat x y = x ^ y;;
+concat "Hello " "world";;
+concat "Hello " "earth";;
+
+concat "Bye " "world";;
+concat "Bye " "earth";;
+
+let hello = concat "Hello ";;
+let bye = concat "Bye ";;
+hello "world"
+hello "earth"
+
+bye "world"
+bye "earth"
+          </code></pre>
+</li>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <p>Break Functions Down</p>
+          <pre style='width:620px'><code data-trim data-line-numbers>
+let f x y z = (x + y) * z);;
+f 3 4 6;;
+let add = f 3 in 
+let mult = add 4 in 
+mult 6;;
+          </code></pre>
+          <p class='fragment fade-up'>Ultimately called a partial application</p>
+          </section>
+          <section data-auto-animate>
+          <p>Some languages or functions only functions that take in one argument</p>
+          <pre style='width:620px'><code data-trim data-line-numbers>
+let f x = (fun y -> x + y);;
+let g = map f [1;2;3;4;5];;
+map (fun h -> h 5) g;;
+          </code></pre>
+          <p class='fragment fade-up'>Technically this works either way in OCaml</p>
+          <p class='fragment fade-up'>Currying built in to OCaml <span class='fragment fade-up'>How?</span></p>
+          </section>
+        </section>
+
+				<section data-auto-animate style="height:600px">
+					<h3>Closures</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="background:blue;bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+          <section data-auto-animate>
+          <p>Remember everything is data in memory</p>
+          <pre style='width:630px'><code class='fragment' data-trim data-line-numbers>
+let add x y = x + y;;
+add 3 4;;
+(* x and y are "local variables" *)
+(* stored in a stack frame *)
+          </code></pre>
+          <p class='fragment fade-up'>Slight Issue</p>
+          <pre style='width:630px'><code class='fragment' data-trim data-line-numbers>
+let partial = add 3;;
+          </code></pre>
+          <p class='fragment fade-up'>Where is 3 stored?</p>
+          </section>
+          <section data-auto-animate>
+          <p>Closure: a tuple of an environment and a function (f,env)</p>
+          <p class='fragment fade-up'>Environment: mapping from variables to values</p>
+          <p class='fragment fade-up'>Evaluated at creation and immutable</p>
+          <pre style='width:630px'><code class='fragment' data-trim data-line-numbers>
+let z = 4;;
+let add x y = x + y;;
+let g = add z;;
+let z = 5;;
+g 1;;
+          </code></pre>
+          </section>
+        </section>
+
+				<section data-auto-animate style="height:600px">
+					<h3>Tail Recursion</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="background:green;bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+          <section data-auto-animate>
+          <p>Recall this fib function</p>
+          <pre style='width:800px'><code class='fragment' data-trim data-noescape data-line-numbers>
+(* fib.ml *)
+let rec fib n = 
+if n &lt; 2 then 1 else (fib (n-1)) - (fib (n-2));;
+          </code></pre>
+          <ul>
+          <li class='fragment fade-up'>imperfect compiler: too many stack frames</li>
+          <li class='fragment fade-up'>Not tail Recursive</li>
+          </ul>
+          <p class='fragment fade-up'>Let's fix this</p>
+          <pre style='width:800px'><code class='fragment' data-trim data-noescape data-line-numbers>
+(* fib-1.ml *)
+let rec fib n a b = 
+if n = 0 then a else fib (n-1) (a+b) a;;
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <p >Let's fix this</p>
+          <pre style='width:800px'><code class='' data-trim data-noescape data-line-numbers>
+(* fib-1.ml *)
+let rec fib n a b = 
+if n = 0 then a else fib (n-1) (a+b) a;;
+          </code></pre>
+          <p class='fragment'>Tail Position: the last thing computed before a function returns</p>
+          <p class='fragment'>Tail Recursion: Having the recursive call be in tail position</p>
+          <p class='fragment'>(Depends on the context: only at top level)</p>
+          </section>
+        </section>
+      </div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/math/math.js"></script>
+    <script src="plugin/search/search.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+		<script>
+     Reveal.configure({
+        keyboard: {
+          40: 'next', // go to the next slide with down arrow
+          38: 'prev', // go to the next slide with up arrow
+        }
+      });
+			Reveal.initialize({
+				center: true,
+				hash: true,
+        controlsTutorial: false,
+        showSlideNumber: 'print',
+        pdfSeparateFragments: false,
+				math: {
+					// mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+					config: 'TeX-AMS_HTML-full',
+					TeX: {
+						Macros: {
+							R: '\\mathbb{R}',
+							set: [ '\\left\\{#1 \\; ; \\; #2\\right\\}', 2 ]
+						}
+					}
+				},
+				plugins: [ RevealHighlight, RevealMarkdown, RevealMath, RevealSearch, RevealZoom ]
+
+			});
+		</script>
+	</body>
+</html>

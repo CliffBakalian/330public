@@ -1,0 +1,851 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+
+\chapter{Ruby}
+\epigraph{A regretful honey maker could be called a rue-bee}{Kliff}
+
+This is a programming language chapter so it has two (2) main things: talk about some properties that the Ruby programming language has and the syntax the language has. If you want to code along, all you need is a working version of Ruby and a text editor. You can check to see if you have Ruby installed by running \texttt{ruby --version}. At the time of writing, I am using Ruby 3.0.4. 
+You can also download an interactive ruby shell called \texttt{irb}. 
+
+\section{Introduction}
+
+Unlike the previous languages you have seen in 131/132 and 216, Ruby does not use a compiler so no machine code is generated. This means that compile-time checks do not exist. This basically means that every check or error is done during run-time. I'll expand more on this in a bit but for now, lets write our first Ruby program. 
+
+\begin{lstlisting}[style=MyRubyStyle]
+# hello_world.rb
+puts "Hello World"
+\end{lstlisting}
+Despite this being very simple, we already learned five (5) things.
+\begin{itemize}
+    \item Single line comments are started with the pound or hashtag symbol
+    \item no semicolons to denote end of statement
+    \item \texttt{puts} is used to print things out to stdout (\texttt{print} if you don't want a newline at the end
+    \item Parenthesis are technically optional when calling functions (but good style says to only leave out if there are no arguments or if the function is \texttt{puts}, \texttt{require}, or \texttt{include})
+    \item ruby file name conventions are \texttt{lowercase\_and\_underscore.rb}
+    \item Strings exists in the language (most languages do, but some do not)
+\end{itemize}
+Now to run our ruby program we can just use
+\begin{lstlisting}[style=MyRubyStyle]
+ruby hello_world.rb
+\end{lstlisting}
+Congrats, you have just made your first program in Ruby!
+
+\section{Typing}
+
+Now we just said that Ruby does not use compile-time checks and all checks and errors are done at run-time. Let's see this in action.
+\begin{lstlisting}[style=MyRubyStyle]]
+# program1.rb
+variable1 = 5
+variable1 = "hello"
+variable2 = 4
+variable3 = variable1 + variable2
+puts varable3
+\end{lstlisting}
+Here is a simple program that sets some variables, adds two things together, and then prints the results.
+This looks weird, but first lets run and see what happens, and then we can look at the syntax. 
+\begin{lstlisting}[language=csh]
+ruby program1.rb
+hw.rb:5:in `+': no implicit conversion of Integer into String (TypeError) 
+    from hw.rb:4:in '<main>'
+\end{lstlisting}
+Looks like we have an error! Seems like \texttt{variable1} and \texttt{variable2} have different types so we can't use \texttt{'+'} on them.
+Which is interesting for 2 main reasons
+\begin{itemize}
+    \item We did not get an error on line 3 when we change \texttt{variable1} from an \texttt{Integer} value to a \texttt{String} value
+    \item there is no automatic conversion of integers to strings like we saw in Java
+\end{itemize}
+The first point is really important, but before we talk about it, let's just modify our code so that it runs without any errors by deleting line 3.
+\begin{lstlisting}[style=MyRubyStyle]]
+# program1-1.rb
+variable1 = 5
+variable2 = 4
+variable3 = variable1 + variable2
+puts varable3
+\end{lstlisting}
+Now if we run our code we get a different error. 
+We get \cout{undefined local variable or method `varable3' for main:Object (NameError)}. 
+Notice that because we check everything during run-time, this error was not picked up until ruby was about to execute it. 
+\textbf{Many bugs from beginner Ruby programmers is due to misspelled variable names}.
+Here is a more visual demonstration of run-time erring.
+\begin{lstlisting}[style=MyRubyStyle]]
+# program1-2.rb
+variable1 = 5
+variable2 = 4
+variable3 = variable1 + variable2
+print variable1
+print " + "
+print variable2
+print " = " # gross. We will learn to convert later
+puts varable3   # still misspelled
+\end{lstlisting}
+If we run the above code, we get \cout{5 + 4 = } printed out and then we get the same \cout{NameError} as before. 
+A error free program would look like 
+\begin{lstlisting}[style=MyRubyStyle]]
+# program1-3.rb
+variable1 = 5
+variable2 = 4
+variable3 = variable1 + variable2
+puts variable3
+\end{lstlisting}
+Now that we fixed this issue, we can talk about why we didn't get an error on line 3 in \texttt{program1.rb}.
+
+Notice that in the above code we set values to variables but we didn't define the type like we did in Java and C.
+This is because Ruby uses \textbf{Dynamic type checking}. 
+Dynamic type checking is a form of type checking which is typically contrasted to \textbf{Static type checking}. 
+\textbf{Type checking} is an action that is used for a \textbf{Type system}, which determines how a language assigns a type to a variable.
+Ultimately: How does a a language know if a variable is an \texttt{int} or a \texttt{pointer}? 
+It does so by type checking.\\
+
+\newpage
+For the most part, you probably only used static type checking since both C and Java are statically typed.
+\textbf{Static typing} means that the type of a variable, construct, function, etc is known at compile time.
+Should we then use a type in an incorrect manner (as we did in \texttt{program1.rb}, then the compiler will raise an error and compilation will be aborted.
+Contrasted to \textbf{Dynamic typing} which means that the type is only calculated at run-time.
+Consider the following:
+\begin{lstlisting}[style=MyCStyle]
+# err.c
+void main(){
+    int x;
+    x = "hello"
+}
+\end{lstlisting}
+Should we try to compile this code with the \texttt{-Werror}\footnote{Canonically it will just raise an error and still compile} compile flag, we will get the following: \cout{error: assignment to ‘int’ from ‘char *’ makes integer from pointer without a cast}. This is because during compilation, the compiler marks the \texttt{x} variable as having a type of int yet is being assigned a pointer.\\
+
+Now how did gcc know that there was a type issue here? 
+The first conclusion would be that we declared \texttt{x} as an \texttt{int} explicitly on line 3. 
+This is called \textbf{manifest or explicit typing} where we explicitly declare the type of any variable we create.
+This is in contrast to \textbf{latent or implicit typing} where we don't have to do this as we saw in ruby.
+It is important to note: \textbf{manifest typing is not the same as static typing}.
+We will see this in OCaml as the language is statically typed, but uses latent typing for its variables.\\
+
+Back to Dynamic type checking, let's look at the following:
+\begin{lstlisting}[style=MyRubyStyle]
+# checking.rb
+def add(a,b)
+    puts a + b
+end
+
+add(1,2)
+add("hello"," world")
+\end{lstlisting}
+
+To begin, this is how you create a function in Ruby.
+Functions begin with the \texttt{def} keyword and end with the \texttt{end} keyword. 
+We will go into ruby code examples later so for now just know this is a function that takes two arguments and then prints the the result of \texttt{a + b}.
+Since Ruby is dynamically typed, we don't assign types to the parameters \texttt{a} and \texttt{b} until we run our code, and not until we actually use the values.
+This allows us to call \texttt{add} with both \texttt{Integers} and \texttt{Strings}. Much like before it is important to note that \textbf{latent typing is not the same as dynamic typing}.
+
+In any case, you may be wondering Ruby knows the types of variables if we don't explicitly declare their types. 
+The process of deciding a type for an expression is called \textbf{Type inference} and we will go more in depth with this in the OCaml section,
+but there are many ways that type inference can be done, and in fact you already saw one way with our \texttt{err.c} program.
+We did not say that \texttt{"hello"} was a \texttt{char *} yet gcc knew because of the syntax of the datatype. 
+The same holds true for ruby. 
+Integers are numbers without decimal points.
+Floats are numbers with decimal points.
+Strings are anything put in quotes.\footnote{We will see how ruby does this when we talk about parsing. In particular Project 4}
+You can check this with the \texttt{.class} method. Did I mention that Ruby is object oriented?
+
+\section{Object Oriented Programming}
+
+You should be familiar with Object Oriented Programming (OOP) because of Java, however, unlike Java, everything is an object in Ruby. 
+Lets test this out. 
+\begin{lstlisting}[style=MyRubyStyle]
+# oop.rb
+puts 3.class
+puts "Hello".class
+puts 4.5.class
+\end{lstlisting}
+You can see that everything, including primitives, are object oriented. 
+Also notice that like java, when calling an object's methods, we use the dot syntax.
+That means that earlier when we called \texttt{a + b} in \texttt{add.rb}, it was actually doing something like \texttt{a.+(b)}. Don't believe me? 
+Consider the following:
+\begin{lstlisting}[style=MyRubyStyle]
+# program2.rb
+m = 3.methods
+puts methods.include?(:+)
+puts 3.+(4)
+\end{lstlisting}
+The Line 2 just gets the methods which the object \cout{3} has as an array. The Line 3 will then print out \cout{true} because we are asking if the array of methods includes the \cout{:+} method. This is actually a symbol, but we will talk about that later. 
+We can then call the \cout{+} method on 3 adding it to 4 and we get \cout{7} as output. Pretty weird right?\\
+
+Other properties of OOP also exist in Ruby. 
+As we saw before, objects have methods, and this is the primary way that objects interact with each other. 
+Recall that Objects are instances of Classes so each Object has it's own state.
+This also means that all values are references to objects (so be careful how you check to see if two values are equal).
+Additionally, Ruby has an inheritance structure similar to Java. 
+In Ruby, all classes are derived from the \texttt{Object} class. 
+
+\begin{lstlisting}[style=MyRubyStyle]
+# oop.rb
+puts 3.class
+puts 3.class.ancestors
+
+a = "hello"
+b = a
+puts a.equal?(b)        #true
+puts a.equal?("hello")  #false
+puts "hello" == "hello" #true
+
+\end{lstlisting}
+
+Object oriented programming in Ruby also means that we need some sort of value to represent the absence of an object. In java it was called \cout{null}, in Ruby, we call it \cout{nil}. \texttt{nil} actually is an object itself and has methods which you can use. 
+\begin{lstlisting}[style=MyRubyStyle]
+# nil.rb
+puts nil.methods
+puts nil.to_s
+\end{lstlisting}
+
+\subsection{Class Creation}
+Let's make our first class
+\begin{lstlisting}[style=MyRubyStyle]
+# square.rb
+class Square
+  def initialize(size)
+    @size = size
+  end
+ 
+  def area
+    @size*@size
+  end
+end 
+ 
+s = Square.new(5)
+puts s.area
+\end{lstlisting}
+There is a lot here, let's break it down. 
+\begin{itemize}
+    \item Lines 1 and 9 is the outline of the class. The name of the class is Square
+    \item lines 2-4 is the Ruby equivalent to the constructor. 
+    \item lines 3 and 7 use \texttt{@size} which is a instance variable
+    \item lines 6-8 is a instance method
+    \item Line 11 is the instantiating of the newly made Square class
+    \item line 12 is calling the instance method
+\end{itemize}
+The Equivalent Java code if below. 
+\newpage\begin{lstlisting}[style=MyJavaStyle]
+// Square.java
+public class Square{
+  private int size;
+  public initialize(size){
+    this.size = size;
+  } 
+ 
+  public int area(){
+    return size*size;
+  }
+} 
+ 
+public static void main(String[] args){
+  Square s = new Square(5);
+  System.out.println(s.area);
+}
+\end{lstlisting}
+
+Notice that the instance variable \texttt{size} is private which means if we wished to access it, we would need to make getters and setters. We could do this by adding the following
+\begin{lstlisting}[style=MyRubyStyle]
+# square-1.rb
+class Square
+# ...
+    # getter
+    def size
+        @size
+    end
+    #setter
+    def size=(s)
+        @size = s
+    end
+end 
+# ...
+\end{lstlisting}
+This is annoying to do for each variable we have so Ruby actually has a built in function to help us: \texttt{\textbf{attr\_accessor}}
+Consider the following:
+\begin{lstlisting}[style=MyRubyStyle]
+# square- 2.rb
+class Square
+    attr_accessor :size
+    # ... same as before ...
+end 
+s = Square.new(5)
+puts s.area
+s.size= 6
+puts s.area
+puts s.size
+\end{lstlisting}
+If you wanted to use \texttt{static} or class variables, you just prepend the variable name with \cout{@@}. So if you wanted to count how many squares were made, you could do so like so:
+\begin{lstlisting}[style=MyRubyStyle]
+# square- 3.rb
+class Square
+    @@count = 0
+    attr_accessor :size
+    def initialize(size)
+        @@count += 1
+        @size = size
+    end
+    
+    def count
+        @@count
+    end
+    # ... same as before ...
+end
+s = Square.new(5)
+s2 = Square.new(6)
+puts s.count
+\end{lstlisting}
+For class or static variables you need to initialize them and write your own getters and setters. You can also make static methods by defining them in terms of the class. See below.
+\begin{lstlisting}[style=MyRubyStyle]
+# counter.rb
+class Counter
+    @@count = 0
+    def initialize()
+        @@count += 1
+    end
+    
+    def Counter.counter
+        @@count
+    end
+end
+c = Counter.new
+c1 = Counter.new
+puts Counter.counter
+\end{lstlisting}
+One other thing you may have noticed is that we did not use the common \textbf{\texttt{return}} keyword. This is because Ruby will return whatever the last line in a function evaluates to. The following 3 methods all do the same thing:
+\begin{lstlisting}[style=MyRubyStyle]
+# return.rb
+def to_s1
+    s = "Hello"
+    return s
+end
+
+def to_s2
+    s = "Hello"
+    s
+end
+
+def to_s3
+    "Hello"
+end
+ puts to_s1
+ puts to_s2
+ puts to_s3
+\end{lstlisting}
+
+Lastly, we stated earlier that classes are all derived from the \texttt{Object} class. 
+This means we must have some form of inheritance.
+It acts much like Java, the syntax is just different.
+\begin{lstlisting}[style=MyRubyStyle]
+# inheritance.rb
+class Shape
+  def to_s
+    "I am a shape" 
+  end
+end
+ 
+class Square < Shape
+  def to_s
+    super() + " and a square"
+  end
+end
+puts Square.new
+\end{lstlisting}
+
+The above created two classes, \texttt{Shape} and \texttt{Square}.
+A \texttt{Square} is a subclass of \texttt{Shape} and so it inherits all its methods.
+If we wish to override our parent's method, we can certainly do so as seen in lines 9-11.
+If we wish to refer to the parent's method we can do so using the \texttt{super} method. 
+In fact we can override any method, but method overloading is not supported. 
+We would get an error should be try to run 
+\begin{lstlisting}[style=MyRubyStyle]
+# overload-err.rb
+class Square
+    def func1(x)
+        puts "func1"
+    end
+    
+    def func1(x,y)
+        puts "func2"
+    end
+end
+Square.new.func1(2,3) #fine
+Square.new.func1(2)   #error
+\end{lstlisting}
+But we could do something like the following
+\begin{lstlisting}[style=MyRubyStyle]
+# override.rb
+class Square
+    def func1(x)
+        puts "func1"
+    end
+    
+    def func1(x)
+        puts "func2"
+    end
+end
+Square.new.func2(1)
+\end{lstlisting}
+
+This can lead to some pretty interesting behaviour where we can add things to existing Classes. In the following example, I am going to add a new method to the \texttt{Integer} class which just returns the double of the value.
+\begin{lstlisting}[style=MyRubyStyle]
+# double.rb
+puts 3.methods.include?(:double)
+
+class Integer
+  def double
+    self + self
+  end
+end
+
+puts 3.methods.include?(:double)
+puts 3.double
+\end{lstlisting}
+
+The \texttt{self} keyword is similar to java's \texttt{this}. It refers to the current object.
+We can also use this power of overriding methods to break ruby
+\begin{lstlisting}[style=MyRubyStyle]
+# break.rb
+class Integer
+  def +(x)
+    "Not Today"
+  end
+
+  def -(x)
+    self * x
+  end
+end
+
+puts 3+4
+puts 3-4
+\end{lstlisting}
+If we run this in irb, it will crash, but if you save this as a file and run it, you get \cout{Not Today} followed by \cout{12}. 
+
+\section{Code blocks}
+Okay, I'll be upfront. I lied earlier when I said everything is an object. Afaik there is only one feature of Ruby which is not object oriented: codeblocks. If you took a look at Section \ref{ruby-syntax} you will know that we can create an Array the following way: 
+\begin{lstlisting}[style=MyRubyStyle]
+a = Array.new(3,"Item")
+\end{lstlisting}
+However, there is another way that you can initialize an array with a default value.
+\begin{lstlisting}[style=MyRubyStyle]
+a = Array.new(3){"Item"}
+\end{lstlisting}
+This is an example of a codeblock. Codeblocks are typically surrounded in curly braces(\{\}) but can also be surrounded with \texttt{do ... end}.
+Codeblocks are not objects so you cannot assign variables to them, nor can you call methods on them. 
+Additionally you cannot pass them into functions as parameters, nor can you return a codeblock as a return value. 
+However there is one important thing to take away from codeblocks: that we can treat code as data. 
+Consider the following:
+\begin{lstlisting}[style=MyRubyStyle]
+def func
+    if block_given?
+        yield
+    end
+end
+func1 {puts "hello"}
+\end{lstlisting}
+The \texttt{yield} keyword on line 3 tells ruby to pass control to the codeblock associated with the function. 
+We can see this more clearly in the following example:
+\begin{lstlisting}[style=MyRubyStyle]
+def func1
+    yield 5
+end
+
+def func2(i)
+    y = i+1
+    puts y
+end
+
+func1 {|i| puts i + 1}
+func2(5) 
+\end{lstlisting}
+Right off the bat, we should acknowledge that codeblocks can take in paramaters when yielded to, as seen on line 2. 
+The syntax for accepting arguments can be shown on line 10, where you suround the arguments in pipbars (|). 
+Anyway, the two function calls on line 10 and 11 have similar behavior., The difference is that when using the codeblock,
+the parameter 5 is kept constant with the code being executed being variable on all calls of func1, whereas func(2) can take in a varaible parameter, but the code executed will always be the same. 
+Let's see this more clearly:
+\begin{lstlisting}[style=MyRubyStyle]
+# similar
+func1 {|i| puts i + 1}
+func2(5) 
+
+#not similar
+func1{|i| puts i %2}
+func2(6)
+
+func1{|i| Array.new(i)}
+func2(3)
+\end{lstlisting}
+If you squint, you can consider this similar to passing in a function pointer in C and then calling said function. 
+Notice that control is passed to the codeblock on a yield and then returned when the codeblock finishes executing. 
+\begin{lstlisting}[style=MyRubyStyle]
+# codeblock not executed unless yield is called
+def func3 
+    puts "hello"
+end
+func3 {puts "World"}
+
+# control passed when yield is called
+def func4
+    yield 1,2
+    yield 3,4
+end
+func4{|a,b| puts a + b}
+\end{lstlisting}
+
+Again, I will reiterate that codeblocks are not objects which means no passing them in as parameters or returning them. 
+\begin{lstlisting}[style=MyRubyStyle]
+# cannot do
+def func5(i)
+    yield i
+    return { puts "hello"} #cannot do
+end
+
+func5({puts "hello"}) # error
+\end{lstlisting}
+
+THere is however a workaround. They are called Procs. Procs create this thing called a closure which we talk about in the OCaml sections. For now, just know that Procs allow us to store codeblocks inside an object. 
+\begin{lstlisting}[style=MyRubyStyle]
+p = Proc.new {puts "Hello"}
+puts p.class
+\end{lstlisting}
+Because procs are objects and not a codeblock, you cannot yield to them, but there are methods you can call from a proc. To execute the code stored in a proc, we can use the \texttt{.call} method. Much like a codeblock, the body of a proc is not executed until the \texttt{call} method is called. 
+\begin{lstlisting}[style=MyRubyStyle]
+def func6(p)
+    p.call
+    p.call
+end
+p = Proc.new {puts "hello"}
+func6(p)
+\end{lstlisting}
+Procs can also take multiple arguments, and afaik, unlike codeblocks, can be nested in eachother. For example
+\begin{lstlisting}[style=MyRubyStyle]
+def func7(x)
+    p = Proc.new {|y| Proc.new {|z| x + y + z}}
+    return p
+end
+a = func7(1)
+b = a.call(2)
+c = b.call(3)
+puts c
+\end{lstlisting}
+Because Procs are objects, we can do some fun things:
+\begin{lstlisting}[style=MyRubyStyle]
+def map(arr,func)
+    for value in arr
+        puts func.call(value)
+    end
+end
+map([1,2,3,4],Proc.new{|i| i + 1})
+
+def execute(arr)
+    for func in arr
+        func.call
+    end
+end
+funcs = [Proc.new{puts "hello"}, Proc.new{puts "Bye"}, Proc.new{puts "C you"}]
+execute(funcs)
+\end{lstlisting}
+\section{Modules}
+
+Now that we talked about the one thing that is not object oriented, let's go back and talk about one issue with object oriented programming in Ruby (and Java): inheritance restrictions.
+In these languages, we have the feature of inheritance, but we can only have one parent class which is not entirely feasible. In java we got around this with interfaces. In ruby, we can use modules. 
+
+Let's write our first module and then we can see how to go about using it:
+\begin{lstlisting}[style=MyRubyStyle]
+module Doubler
+    def Doubler.base
+        2
+    end
+    
+    def double
+        self + self
+    end
+end
+\end{lstlisting}
+This module has both a static and an instance method. The syntax for this module is similar to Ruby's Class creation. 
+We create static methods with the \texttt{<Classname>.<method>} syntax and create instance methods using the common \texttt{def\dots end} keywords. There are a few things to note about Modules that make them different from classes:
+\begin{itemize}
+    \item Modules cannot be instantiated
+    \item Modules use the \texttt{module} keyword instead of the \texttt{class} keyword
+    \item cannot be extended like a class
+\end{itemize}
+That's it. Pretty simple. We cannot extend modules but we can still overwrite them; But we are getting ahead of ourselves. Let's just first see how we use them. 
+\begin{lstlisting}[style=MyRubyStyle]
+class Integer
+    include Doubler
+end
+puts 10.double
+\end{lstlisting}
+Here we are adding the \texttt{Doubler} module to the \texttt{Integer} class so any integer now has access to the \texttt{doubler} method. 
+We can also do things like
+\begin{lstlisting}[style=MyRubyStyle]
+puts Doubler.base
+puts Doubler.class
+puts Doubler.instance_methods
+\end{lstlisting}
+But because we cannot instantiate we cannot do
+\begin{lstlisting}[style=MyRubyStyle]
+Doubler.new
+Doubler.double
+\end{lstlisting}
+
+The only thing that may be confusing with Modules is when it comes to overwritten methods. Consider the following:
+\begin{lstlisting}[style=MyRubyStyle]
+module M1
+    def bye
+        "Goodbye"
+    end
+end
+
+module M2
+    def bye
+        "Bye"
+    end
+end
+
+class C
+    include M1
+    include M2
+end
+
+puts C.new.bye
+\end{lstlisting}
+In this case, we load modules in the order we include them so M2 has the last instance of defining \texttt{bye} so M2's bye method will be called. Had we swapped the order:
+\begin{lstlisting}[style=MyRubyStyle]
+class C
+    include M2
+    include M1
+end
+\end{lstlisting}
+Then M1's bye method would be called instead. 
+If we had an instance method in the C class, then we would call C's bye method. 
+\begin{lstlisting}[style=MyRubyStyle]
+class C
+    include M2
+    include M1
+    
+    def bye
+        "C ya"
+    end
+end
+\end{lstlisting}
+Typically the order in which something is called is by first looking at self, then the self's modules, then the parent's instance methods, then the parent's modules, then the grandparent's instance methods, then the grandparent's modules, etc. 
+We can see that here:
+\begin{lstlisting}[style=MyRubyStyle]
+module M1
+    def bye
+        "Goodbye"
+    end
+end
+
+module M2
+    def bye
+        "Bye"
+    end
+end
+
+class C
+    include M1
+end
+
+class D < C
+    include M2
+end
+puts D.new.bye
+\end{lstlisting}
+If you are ever unsure of the order, you can always use the \texttt{.ancestors} method. 
+\begin{lstlisting}[style=MyRubyStyle]
+puts D.new.class.ancestors
+# [D,M2,C,M1,Object,Kernel,BasicObject]
+\end{lstlisting}
+There is one important thing to note: once something is loaded, it will not be loaded again.
+\begin{lstlisting}[style=MyRubyStyle]
+class C
+    include M2
+    include M1
+end
+
+class D < C
+    include M2
+end
+puts D.new.bye
+\end{lstlisting}
+
+Some Modules we have kinda seen before, namely the \texttt{Comparable} and \texttt{Enumerable} modules. Any Class that includes the \texttt{Comparable} module supports \texttt{<.>,,<=,>=,=} operators. Classes that include the \texttt{Enumerable} allow things like \texttt{map} and \texttt{select}. 
+
+\section{Data Types and Syntax}\label{ruby-syntax}
+That is pretty much all you need to know about Ruby for this course for now.
+All that's left is to go over syntax of data types and other things.
+
+\subsection{Numbers}
+There are two common types of numbers: \texttt{Integers} and \texttt{Floats}. 
+An \texttt{Integer} is a positive or negative integer value without a decimal point. 
+A \texttt{Float} is a positive or negative value with a decimal point and at least one digit on either side of said point.
+When performing operations between the same types, the resulting value is the same type. 
+When performing an operation which involves a \texttt{Float}, the resulting value is typically also a \texttt{Float}. 
+For some reason, Ruby also allows you to use an underscore as a separator. Maybe for readability?
+\begin{lstlisting}[style=MyRubyStyle]
+# numbers.rb
+-1 + 1 # addition between Integers
+6.5 % 1.2 # modulus between Floats
+
+2. # not valid for floats
+.1 # also not valid
+
+3.0/2 # will result in a Float
+
+1_000_000 == 1000000 # true
+\end{lstlisting}
+
+\subsection{Stings and Symbols}
+Strings in ruby are anything in-between double or single quotes.
+Since things are Objects in Ruby, Strings follow structural equality, but not physical equality. 
+You can nest single and double quotes if you want to print one or the other.
+\begin{lstlisting}[style=MyRubyStyle]
+# strings.rb
+"String 1"
+'String 1'
+'String' == "String"      # true
+"string".equal?("string") # false
+\end{lstlisting}
+
+Symbols on the other hand are special strings, but only one of each symbol exits meaning they are physically equal. 
+Since they are physically equal, they are also structurally equal. 
+A symbol can be any valid string but is written with a \cout{:} in the front. 
+You can add quotes if you have a multi-word symbol.
+We have seen symbols when using \texttt{attr\_accessor} and \texttt{.methods}.
+
+\begin{lstlisting}[style=MyRubyStyle]
+# symbol.rb
+:"String 1"
+:'String 1'
+:"string".equal?(:"string") # true
+:"string".equal?(:'string') # true
+:"string".equal?(:string)   # true
+\end{lstlisting}
+
+\subsection{Arrays}
+Arrays use the very common bracket syntax for both creation and indexing.
+Unlike in most languages, arrays can be heterogeneous which is nice.
+Ruby arrays also support dynamic sizing and set operations.
+Any value not initialized because \texttt{nil}.
+One important thing to note is that when dealing with n-Dimensional arrays, you must always have the previous dimension declared.
+\begin{lstlisting}[style=MyRubyStyle]
+# arr.rb
+# creating
+arr = []
+arr = [1,2,3,4]
+arr = [1,2.0,"hello"]
+
+arr = Array.new(3) # [nil,nil,nil]
+arr = Array.new(3,"a") # ["a","a","a"]
+
+# indexing
+a = [1,2,3,4]
+puts a[0]   # 1
+puts a[-1]  # 4
+
+# dynamic sizing
+arr = []
+arr[4] = 5
+puts arr # [nil,nil,nil,nil,5]
+
+# set stuff
+a = [1,2,3,4,5]
+b = [4,5,6,7,8]
+puts a+b # [1,2,3,4,5,4,5,6,7,8]
+puts a|b # [1,2,3,4,5,6,7,8]
+puts a&b # [4,5]
+puts a-b # [1,2,3]
+
+#adding and removing
+a = [1,2,3]
+a.push(4)
+puts a # [1,2,3,4]
+a.pop
+puts a # [1,2,3]
+a.unshift(0)
+puts a # [0,1,2,3]
+a.shift
+puts a # [1,2,3]
+a.delete_at(1)
+puts a # [1,3]
+a.delete(3)
+puts a # [1]
+
+a2d = [][] # error
+a2d = []
+a2d[0] = []
+puts a2d # [[]]
+
+# you can also use a code block
+a2d = Array.new(3){Array.new(3)} # create a 3x3 matrix 
+puts a2d #[[nil,nil,nil],[nil,nil,nil],[nil,nil,nil]]
+
+\end{lstlisting}
+Unlike some languages, Hashes are built into Ruby. 
+This means you don't have to make your own hashing mechanism or hash function (though you should if you are doing this for security purposes).
+Ruby uses the common curly brace syntax for creation and the bracket syntax to index.
+If a key does not exist in the hash, it is automatically mapped to nil.
+You can change the default hash if you want.
+Hashes in ruby are very much like arrays, except instead of mapping numbers (or indexes) to values, you can map anything to anything. 
+That is to say, keys do not have the be the same amongst each other and the same for values. Keys and values also do not have to have the same type.
+Like Arrays, when dealing with n-Dimensional arrays, you must always have the previous dimension declared.
+\begin{lstlisting}[style=MyRubyStyle]
+# arr.rb
+# creating and indexing
+h = {}
+h = {"key" => :value,}
+h = Hash.new
+puts h['key'] # nil 
+h = Hash.new(:default)
+puts h['key'] # :default
+
+# adding
+h = {}
+h['key1'] = :value1
+puts h # {'key1'=>:value1}
+h.delete('key1')
+puts h # {}
+
+# Multi-dimensional Hashes
+h = {}
+h[0] = {}
+h[0][0] = 4
+h2 = {}
+h2[0][0] = 4 # error
+\end{lstlisting}
+
+
+\subsection{Control Flow}
+The most simple version of control flow is the \texttt{if} statement. You should know what an \texttt{if} statement is by now so I won't discuss what they are or how they work.
+Instead lets talk about the bigger class of statements: control statements. Control statements control the flow of program execution;
+More specifically they alter which command comes next.
+There are several in Ruby: \texttt{if, while, for, until, do while} the main ones, but most people just use the first 3. 
+For those that have a boolean check, \cout{true} is anything that is not \cout{false} or \cout{nil}. 
+\cout{nil} is like null, it is used for initialized fields. however, \cout{nil} is an object itself of the \texttt{NilClass}.
+\cout{true} and \cout{false} are also objects of \texttt{TrueClass} and \texttt{FalseClass} respectively. 
+Note:\textbf{\texttt{FalseClass} and \texttt{NilClass} do not evaluate to false}. Consider the following:
+\begin{lstlisting}[style=MyRubyStyle]
+# conditional.rb
+count = 1
+while count >= 0
+    if 3 > 4 then # then is optional
+        puts hello
+    elsif nil
+        puts "nil is true"
+    else
+        if count == 0
+            puts FalseClass == false
+        end
+        puts NilClass == false
+    end
+    count -= 1
+end
+\end{lstlisting}
+You should run this code to see what happens but but here are 3 important things
+\begin{itemize}
+    \item on line \texttt{5}, \texttt{hello} is an undefined variable but Ruby never catches this.
+    Since Ruby is dynamically typed, this bug goes unnoticed.
+    \item instead of \texttt{elseif} or \texttt{else if}, ruby uses \texttt{elsif}. Why, I have no idea. This is a common bug
+    \item the \texttt{end} keyword is commonly used whenever you would otherwise use \} in other languages
+\end{itemize}
+You can read more at \href{https://docs.ruby-lang.org/en/3.0/syntax/control_expressions_rdoc.html}{the Ruby Docs}.
+
+\end{document}

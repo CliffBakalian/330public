@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>CMSC330 - Finite Machines</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/white.css" id="theme">
+		<link rel="stylesheet" href="plugin/highlight/stackoverflow.css">
+
+		<link rel="stylesheet" href="dist/mystyle.css"> 
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-auto-animate data-auto-animate-unmatched="fade-up">
+          <h1>CMSC330</h1>
+          <h3>Finite Machines</h3>
+				</section>
+
+				<section data-auto-animate class='fixvert'style="height: 600px">
+					<h3>Finite Machines</h3>
+					<div class='fragment tl-diamond' data-fragment-index="1" data-id="1" style="background:purple;top:100px;"></div>
+          <div class='fragment tl-data' data-fragment-index="1" style="top:93px;">Finite State Machines</div>
+
+					<div class='fragment tl' data-fragment-index="2" style="top:140px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="2" data-id="2" style="background:blue;top:180px;"></div>
+					<div class='fragment tl-data' data-fragment-index="2" style="top:173px;">Regex</div>
+
+					<div class='fragment tl' data-fragment-index="3" style="top:220px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="3" data-id="3" style="background:green;top:260px;"></div>
+					<div class='fragment tl-data' data-fragment-index="3" style="top:253px;">Regex and FSMs</div>
+
+				</section>
+
+				<section data-auto-animate class='fixvert' style="height:600px;">
+					<h3>Finite State Machines</h3>
+					<div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+        </section>
+
+				<section data-auto-animate style="height:600px;">
+					<h3>Finite State Machines</h3>
+					<div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+<!---          <canvas id="cardinal" width="800" height="500"></canvas> --->
+          <section data-auto-animate>
+          <p>Make a graph to model actions and states of the world</p>
+          <img class='fragment' data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/cardinal/c00.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Make a graph to model actions and states of the world</p>
+          <img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/cardinal/c01.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Make a graph to model actions and states of the world</p>
+          <img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/cardinal/c02.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Make a graph to model actions and states of the world</p>
+          <img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/cardinal/c03.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Make a graph to model actions and states of the world</p>
+          <img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/cardinal/c04.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Make a graph to model actions and states of the world</p>
+          <img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/cardinal/c05.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Make a graph to model actions and states of the world</p>
+          <img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/cardinal/c06.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Make a graph to model actions and states of the world</p>
+          <img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/cardinal/c07.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Make a graph to model actions and states of the world</p>
+          <img data-auto-animate-unmatched=false data-auto-animate-duration=0 src='dist/assets/cardinal/c08.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>Make a graph to model actions and states of the world</p>
+          <img src='dist/assets/cardinal/c08.png'></img>
+          <ul>
+          <li class='fragment fade-up'>0: Face North</li>
+          <li class='fragment fade-up'>1: Face East</li>
+          <li class='fragment fade-up'>2: Face South</li>
+          <li class='fragment fade-up'>3: Face West</li>
+          </ul>
+          <p class='fragment fade-up'>Based on where I am, and what I see, go elsewhere</p>
+          </section>
+          <section data-auto-animate>
+          <img src='dist/assets/cardinal/c08.png'></img>
+          <p class='fragment fade-up'>Each Node is a State, and they are finite</p>
+          </section>
+          <section data-auto-animate>
+          <p>Each Node is a State, and they are finite</p>
+          <p class='fragment fade-up'>Basis for Push Down Automata and Turing Machines</p>
+          <p class='fragment fade-up'>Limited operations, but enough for Regex</p>
+          </section>
+        </section>
+
+				<section data-auto-animate style="height:600px">
+					<h3>Regex</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="background:blue;bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+          <section data-auto-animate>
+          <p>Recall the things we needed for Regex</p>
+          <ul>
+          <li class='fragment fade-up'>Alphabet</li>
+          <li class='fragment fade-up'>Concatenation</li>
+          <li class='fragment fade-up'>Branching</li>
+          <li class='fragment fade-up'>Repetition</li>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <p>Recall the things we needed for Regex</p>
+          <ul>
+          <li>Alphabet</li>
+          <ul>
+          <li class='fragment fade-up'><strong>Set</strong> of symbols allowed</li>
+          <li class='fragment fade-up'>Denoted by: \(\sum\)</li>
+          <li class='fragment fade-up'>String: finite sequence of symbols from \(\sum\)</li>
+          </ul>
+          </ul>
+          <p class='fragment'>Recall that a Regex describes a set of strings</p>
+          <p class='fragment'>This set is called the language</p>
+          </section>
+          <section data-auto-animate>
+          <p>Recall the things we needed for Regex</p>
+          <ul>
+          <li>Concatenation</li>
+          <ul>
+          <li class='fragment fade-up'>Suppose that \(L_1\) and \(L_2\) are languages</li>
+          <li class='fragment fade-up'>\(L_1\) concatenated with \(L_2\): \(L_1L_2\)</li>
+          <li class='fragment fade-up'>\(L_1L_2 = \{xy \vert x \in L_1 \land y \in L_2\}\)</li>
+          </ul>
+          </ul>
+          <p class='fragment'>\(L_1 = \{'c'\}, L_2 = \{'m'\}, L_{3} = \{'s'\}\)</p>
+          <p class='fragment'>\(L_1L_2L_3L_1\) = <tt>/cmsc/</tt></p>
+          </section>
+          <section data-auto-animate>
+          <p>Recall the things we needed for Regex</p>
+          <ul>
+          <li>Branching (Union)</li>
+          <ul>
+          <li class='fragment fade-up'>Suppose that \(L_1\) and \(L_2\) are languages</li>
+          <li class='fragment fade-up'>\(L_1\) unioned with \(L_2\): \(L_1 \cup L_2\)</li>
+          <li class='fragment fade-up'>\(L_1 \cup L_2 = \{x \vert x \in L_1 \lor x \in L_2\}\)</li>
+          </ul>
+          </ul>
+          <p class='fragment'>\(L_1 = \{'a'\}, L_2 = \{'b'\}, \dots, L_{26} = \{'z'\}\)</p>
+          <p class='fragment'>\(L_1\cup L_2\cup \dots \cup L_{26}\) = <tt>/[a-z]/</tt></p>
+          </section>
+          <section data-auto-animate>
+          <p style='font-size:30px'>\(L_1 = \{'a'\}, L_2 = \{'b'\}, \dots, L_{26} = \{'z'\}\)</p>
+          <p style='font-size:30px'>\(L_1\cup L_2\cup \dots \cup L_{26}\) = <tt>/[a-z]/</tt></p>
+          <p class='fragment fade-up' style='font-size:30px'>\(L_{27} = \{'0'\}, L_{28} = \{'1'\}, \dots, L_{37} = \{'9'\}\)</p>
+          <p class='fragment fade-up' style='font-size:30px'>\((L_1\cup \dots \cup L_{26})(L_{27}\cup \dots \cup L_{37})\) = <span class='fragment fade-up' ><tt>/[a-z][0-9]/</tt></span></p>
+          <p class='fragment fade-up' style='font-size:30px'>\(((L_1\cup \dots \cup L_{3})(L_1\cup \dots \cup L_{3}))\cup (L_1\cup \dots \cup L_{3})\) = <span class='fragment fade-up' ><tt>/[abc]{1,2}/</tt></span></p>
+          <p class='fragment fade-up' style='font-size:30px'>\(L_{38} = \{'-'\}\)</p>
+          <p class='fragment fade-up' style='font-size:30px'>\((L_{38}(L_{27}\cup \dots \cup L_{37}))\cup (L_{27}\cup \dots \cup L_{37})\) = <span class='fragment fade-up' ><tt>/-?\d/</tt></span></p>
+          <p class='fragment fade-up' style='font-size:30px'>\((L_1\cup \dots \cup L_{n})\) = <span class='fragment fade-up' ><tt>/./</tt></span></p>
+          </section>
+          <section data-auto-animate>
+          <p>Recall the things we needed for Regex</p>
+          <ul>
+          <li>Repetition (Kleene closure)</li>
+          <ul>
+          <li class='fragment fade-up'>Suppose that \(L_1\) is a language</li>
+          <li class='fragment fade-up'>The Kleene Closure of \(L_1\): \(L_1^*\)</li>
+          <li class='fragment fade-up'>\(L_1^* = \{x|x \in \epsilon \lor x \in L_1 \lor x \in L_1L_1 \lor \dots\}\)</li>
+          </ul>
+          </ul>
+          <p class='fragment'>\(L_1 = \{'a'\}\)</p>
+          <p class='fragment'>\(L_1^*\) = <tt>/a*/</tt></p>
+          <p class='fragment'>\(L_1L_1^*\) = <tt>/a+/</tt></p>
+          </section>
+          <section data-auto-animate>
+          <p>We can put everything together to make a grammer</p>
+          <p class='fragment'>\(\begin{array}{rl}
+          R \rightarrow & \emptyset\\
+          & \vert \epsilon\\
+          & \vert \sigma \\
+          & \vert R_1R_2\\
+          & \vert R_1\vert R_2\\
+          & \vert R_1^*\\
+          \end{array}
+          \)</p>
+          <p class='fragment fade-up'>More on Grammars later</p>
+          </section>
+          <section data-auto-animate>
+          <p>More on Grammars later</p>
+          <p class='fragment fade-up'>Languages created by Regular Languages are regular languages</p>
+          <p class='fragment fade-up'>Suppose \(L\) is a language created by a RE \(r\)</p>
+          <p class='fragment fade-up'>If string \(s \in L\) then \(r\) accepts \(s\) </p>
+          <p class='fragment fade-up'>Not everything can described with Regex</p>
+          </section>
+        </section>
+
+				<section data-auto-animate style="height:600px">
+					<h3>Regex and FSMs</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="background:green;bottom:-30px;"></div>
+          <section data-auto-animate>
+          <p>Goal: create a machine to see if \(r\) accepts \(s\)</p>
+          <p class='fragment fade-up'>This machine can be represented by a FSM</p>
+          <img class='fragment' src='dist/assets/regex/r0.png'></img>
+          </section>
+          <section data-auto-animate>
+          <img src='dist/assets/regex/r0.png'></img>
+          <p class='fragment fade-up'>Let's break this down</p>
+          <ul>
+          <li class='fragment fade-up'>Two States: S0, S1</li>
+          <li class='fragment fade-up'>Initial State: S0</li>
+          <li class='fragment fade-up'>Accepting State: S1</li>
+          <li class='fragment fade-up'>Transistions: 0,1</li>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <img src='dist/assets/regex/r0.png'></img>
+          <p>Let's break this down</p>
+          <ul>
+          <li>Two States: S0, S1</li>
+          <li>Initial State: S0</li>
+          <ul>
+          <li>Can only have 1</li>
+          </ul>
+          <li>Accepting State: S1</li>
+          <li>Transistions: 0,1</li>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <img src='dist/assets/regex/r0.png'></img>
+          <p>Let's break this down</p>
+          <ul>
+          <li>Two States: S0, S1</li>
+          <li>Initial State: S0</li>
+          <li>Accepting State: S1</li>
+          <ul>
+          <li>Can only have zero or more</li>
+          </ul>
+          <li>Transistions: 0,1</li>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <img src='dist/assets/regex/r0.png'></img>
+          <p>Let's break this down</p>
+          <ul>
+          <li>Two States: S0, S1</li>
+          <li>Initial State: S0</li>
+          <li>Accepting State: S1</li>
+          <li>Transistions: 0,1</li>
+          <ul>
+          <li>Denote symbols on an Alphabet</li>
+          </ul>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <p>What is this Regex?</p>
+          <img style='height:300px;width=400px;'src='dist/assets/regex/r1.png'></img>
+          <p class='fragment fade-up'>even binary numbers or the empty string</p>
+          </section>
+          <section data-auto-animate>
+          <p>What is this Regex?</p>
+          <img src='dist/assets/regex/r2.png'></img>
+          <p class='fragment fade-up'>/((a*b+)|(a+b*))c+/</p>
+          </section>
+          <section data-auto-animate>
+          <p>What is this Regex?</p>
+          <img src='dist/assets/regex/r3.png'></img>
+          <p class='fragment fade-up'>month/day/year Date format</p>
+          </section>
+          <section data-auto-animate>
+          <p>What would this machine look like?</p>
+          <p>Strings with even number of 0s and odd number of 1s</p>
+          <img class='fragment' src='dist/assets/regex/r4.png'></img>
+          </section>
+          <section data-auto-animate>
+          <p>What would this machine look like?</p>
+          <p>strings of a, b, and c with no same consucutive letters</p>
+          <img class='fragment' src='dist/assets/regex/r5.png'></img>
+          </section>
+        </section>
+      </div>
+		</div>
+
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/math/math.js"></script>
+    <script src="plugin/search/search.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+    <script src="canvas/shapes.js"></script>
+    <script src="canvas/initShapes.js"></script>
+		<script>
+     Reveal.configure({
+        keyboard: {
+          40: 'next', // go to the next slide with down arrow
+          38: 'prev', // go to the next slide with up arrow
+        }
+      });
+			Reveal.initialize({
+				center: true,
+				hash: true,
+        controlsTutorial: false,
+        showSlideNumber: 'print',
+        pdfSeparateFragments: false,
+				math: {
+					// mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+					config: 'TeX-AMS_HTML-full',
+					TeX: {
+						Macros: {
+							R: '\\mathbb{R}',
+							set: [ '\\left\\{#1 \\; ; \\; #2\\right\\}', 2 ]
+						}
+					}
+				},
+				plugins: [ RevealHighlight, RevealMarkdown, RevealMath, RevealSearch, RevealZoom ]
+
+			});
+		</script>
+    <script>
+//Reveal.on( 'slidechanged', event => {
+//  if (event.indexh == 3 ) {
+//    drawCardinalInit();
+//  }
+//  if (event.indexh == 5 ) {
+//    if (event.indexv == 0){
+//      console.log(event.indexv)
+//      drawTestInit();
+//      drawleft();
+//    }
+//    if (event.indexv == 1){
+//      console.log(event.indexv)
+//      drawTestInit();
+//      drawright();
+//    }
+//  }else{
+//    window.cancelAnimationFrame(raf);
+//  }
+//});
+    </script>
+
+<!--    <script>
+    var ball = {
+      x: 400,
+      y: 400,
+      vx: 5,
+      degree:0,
+      av: 5,
+      radius: 25,
+      color: 'blue',
+      draw: function() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, deg*this.degree, true);
+        ctx.closePath();
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+    };
+      function drawTestInit() {
+        canvas = document.getElementById('testing');
+        ctx = canvas.getContext('2d');
+        window.cancelAnimationFrame(raf);
+      }
+      function drawleft() {
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        if (ball.degree >360 || ball.degree < 0){
+          ball.av = -ball.av;;
+        }
+        ball.degree+=ball.av;
+        ball.draw();
+        ball.x += ball.vx;
+        if (ball.x + ball.vx > 500 ||
+            ball.x + ball.vx < 100) {
+          window.cancelAnimationFrame(raf)
+        }else{
+          raf = window.requestAnimationFrame(drawleft);
+        }
+      }
+      function drawright() {
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        if (ball.degree >360 || ball.degree < 0){
+          ball.av = -ball.av;;
+        }
+        ball.degree+=ball.av;
+        ball.draw();
+        ball.x -= ball.vx;
+
+        if (ball.x + ball.vx > 500||
+            ball.x + ball.vx < 100) {
+          window.cancelAnimationFrame(raf)
+        }else{
+          raf = window.requestAnimationFrame(drawright);
+        }
+      }
+    </script> --->
+	</body>
+</html>

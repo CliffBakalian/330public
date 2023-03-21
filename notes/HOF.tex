@@ -1,0 +1,574 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+
+\chapter{Higher Order Functions}
+\epigraph{The headquarters of the Order of the Phoenix may be found at number twelve, Grimmauld Place, London.}{Harry Potter}
+\section{Intro}
+We cover this topic in OCaml so the examples here will be mostly written in OCaml.
+
+\section{Functions as we know them}
+
+Let us first define a function. A function is something that takes in input, or a argument and then returns a value. 
+As programmers, we typically think of functions as a thing that takes in multiple input and then returns a value. 
+Technically this is syntactic sugar for the most part but that's a different chapter. 
+The important part is that we have this process that has some sort of starting values, and then ends up with some other final value. 
+
+in the past, functions may have looks liked any of the following
+\begin{lstlisting}
+\\ java
+int area(int length, int width){
+    return length * width;
+}
+/* C */
+int max(int* arr, int arr_length){
+    int max = arr[0]
+    for(int i =1; i < arr_length; i++)
+        if arr[I] > max
+            max = arr[i];
+    return max;
+}
+
+# Ruby
+def char-sum(str)
+    sum = 0
+    str..each_char{|i| sum += i.ord}
+    sum
+end
+
+(* OCaml *)
+let circumference radius = 3.14 *. 2. *. radius
+\end{lstlisting}
+
+In these functions, our inputs were things like data structures, or 'primitives'. Ultimately, our inputs were some sort of data type supported by the language. Our return value is the same, could be a data structure, could be a 'primitive', but ultimately some data type that is supported by the language. 
+
+This should hopefully all be straightforward, a review and pretty familiar. The final note of this section is there are 3 (I would say 4) parts of a function. We have the function name, the arguments, and the body (and then I would include the return type or value as well). 
+Again this shouldn't be new, just wanted this here so we are all on the same page.
+
+\section{Higher Programming}
+As we said, functions take in arguments that can be any data type supported by the language. A higher order programming language is one where functions themselves are considered a data type. We saw this in OCaml, but let's take a deeper look at it now. 
+
+Let us consider the following C program:
+\begin{lstlisting}[style=MyCstyle]
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int add1(int x){
+  return x + 1;
+}
+int sub1(int x){
+    return x - 1;
+}
+
+// return a function pointer
+int* getfunc(){
+  int (*funcs[2])(int) = {sub1, add1};
+  return funcs[rand()%2];
+}
+
+// take in a function pointer
+void apply(int f(int), int arg1){
+  int ret = (*f)(arg1);
+  printf("%d\n",ret);
+}
+
+int main(){
+  int i;
+  srand(time(NULL));
+  for(i = 0; i < 5; i++){
+    apply(getfunc(),3); //playing with pointers
+  }
+}
+
+\end{lstlisting}
+This program has one function that returns a function pointer, and one function that takes in a function pointer. 
+The idea of this is the basis of allowing functions to be treated as data. 
+For most languages we have the ability to bind variables to data. 
+\begin{lstlisting}
+int x = 3; // C, Java
+y = 4 # Ruby
+let z = 4.2;; (* OCaml *)
+// idea
+// variable = data
+\end{lstlisting}
+If we consider what is going on in the machine (Maybe recall from 216), then we know that any piece of data is just 1s and 0s stored at some memory address. The variable name helps us know which memory address we are storing things (so we don't have to remember what we stored at address 0x012f or something). 
+When we want to then refer to that data, we use the memory address (variable name) and we retrieve that data. 
+Why should a function be any different? 
+We previously saw a pointer to a function being passed around, which just means the pointer to a list of procedures that are associated with the function. 
+So in the case of higher order programming, we are just allowing functions to be passed in function data as arguments or be returned. 
+
+Thus we can say that a higher order function is one which takes in or returns another function. We can also avoid all these \texttt{void} pointers and casting and stuff in most functional languages like OCaml:
+\begin{lstlisting}[style=Myocamlstyle]
+(* takes in a function)
+let apply f x = f x;;
+(* returns a function *)
+let get_func = let add1 x = x + 1 in add1;;
+\end{lstlisting}
+
+\section{Anonymous Functions}
+So we just said that we bind data to variables if we want to use them again. Sometimes though, we don't want to use them again, or we have no need to store a function for repeated use. So we have this idea of anonymous functions. It is anonymous because it has no (variable) name, which also means we cannot refer to it later. The syntax of an anonymous function is 
+\begin{lstlisting}[style=Myocamlstyle]
+(* add1 *)
+fun x -> x + 1
+(* add *)
+fun x y -> x + y
+(* general syntax *)
+(* fun var1:t1 var2:t2 ... varx:tx -> e:ty *)
+(* has type (t1 -> t2 -> ... -> tx -> ty) *)
+\end{lstlisting}
+This is no different that just saying something like \texttt{2 + 3} instead of saying something like (* let x = 2 + 3 *). 
+This means that we can do the same thing by doing something like 
+\begin{lstlisting}[style=Myocamlstyle]
+2 + 3                     (* expression by itself, no variable *)
+let x = 2 + 3             (* expression then bound to a variable *)
+fun x -> x + 1            (* function by itself, no variable *)
+let add1 = fun x -> x + 1 (* function bound to variable *)
+\end{lstlisting}
+Which means \texttt{let add1 x = fun x -> x + 1} is just syntactic sugar  of \texttt{let add1 fun x -> x + 1}. 
+This is because OCaml and other functional programming languages are based on this thing called lambda calculus, which is another chapter. 
+But if we think about our mathematical definition of a function: it is something that takes in 1 input, and returns 1 output.
+So if each function should have 1 input, then what about something like \texttt{let plus x y = x + y}? 
+
+\section{Partial Applications}
+Recall a section or something ago when we said that higher order functions can take in functions as arguments, and return functions as return values. Consider: 
+\begin{lstlisting}[style=Myocamlstyle]
+let plus x y = x + y
+(* int -> int -> int *)
+\end{lstlisting}
+We said earlier that functions have types where the last thing in the type is the return value, and the first few items are the input types. We kinda lied. Let us consider:
+\begin{lstlisting}
+let plus x y = x + y
+(* int -> int -> int *)
+let plus x = fun y -> x + y
+(* int -> int -> int *)
+(* int -> (int -> int) *)
+\end{lstlisting}
+This last function does have type \texttt{int -> int -> int} but consider what the syntax says. \texttt{plus} is a function that takes in an \texttt{int} but then returns a function that itself takes in an \texttt{int} and returns an \texttt{int}. 
+Which means we can actually define plus as 
+\begin{lstlisting}[style=Myocamlstyle]
+let plus = fun x -> fun y -> x + y;;
+\end{lstlisting}
+If we can define functions like this then we can do things like 
+\begin{lstlisting}[style=Myocamlstyle]
+let plus = fun x -> fun y -> x + y
+let add3 = plus 3 (* returning fun y -> 3 + y *)
+add3 5 (* returns 8 *)
+\end{lstlisting}
+This is called a partial application of a function, or the process of currying. Not all functional languages support this unless the function is specifically defined as one which returns a function. 
+
+It is important to note here that you can only partially apply variables in the order used in the function declaration. 
+That is a function like \texttt{let add = fun x -> fun y -> x + y} can only partially apply the \texttt{x} variable: \texttt{let add4 = add 4}. This is because we are technically doing something like \texttt{let add4 = fun y -> 4 + y}.
+If we wanted to partially apply the second parameter we would need to do something \texttt{let flip f x y = f y x in flip sub}. 
+
+To be more clear:
+\begin{lstlisting}[style=Myocamlstyle]
+let sub x y = x - y
+(* same as let sub = fun x -> fun y -> x - y *)
+let minus3 = sub 3
+(* let minus3 = fun y -> 3 - y *)
+(* we cannot partially apply the second argument to sub unless we have a new function *)
+(* we could make a sub specific function *)
+let minus y = sub y 3
+(* but let's make something generic *)
+let flip x y = f y x
+(* let flip = fun f -> fun x -> fun y -> f y x *)
+let sub3 = flip sub 3
+(* let sub3 = fun y -> sub y 3 *)
+\end{lstlisting}
+
+So how does and currying supported language know what the values of variables are? Or how are partially applicated functions implemented? 
+The answer lies with this idea of a closure, something thing that a Ruby Proc is. 
+
+\section{Closures}
+If you look up the \texttt{Proc} object in the Ruby Docs, you will see that they call a Proc a closure. A closure is a way to create/bind something called a context or environment. Consider the following:
+\begin{lstlisting}
+let and4 w x y z = w && x && y && z
+(* and4 = fun w -> fun x -> fun y -> fun z -> w && x && y && z *)
+let and3 = add4 true
+(* and3 = fun x -> fun y -> fun z -> true && x && y && z *)
+let and2 = and3 true
+(* and2 = fun y -> fun z -> true && true && y && z *)
+\end{lstlisting}
+How does the language or machine know that you want to bind say variable \texttt{w} to \texttt{true}?
+To be honest, there is no magic, we just store the function, and then a list of key-value pairs of variables to values. This list of key-value pairs is called an environment. A closure is typically just a tuple of the function and the environment. 
+Visually, a closure might look like the following:
+\begin{lstlisting}
+let sub x y = x - y
+let sub3 = sub 3
+(* sub3 may look like 
+(function: fun y -> x - y, environment: [x:3])
+*)
+\end{lstlisting}
+Very much like a \texttt{Proc} (because a \texttt{Proc} is a closure), a closure is not evaluated, or run until it is called. Thus, once made, the closure will not be modified. Thus the following would have no affect:
+\begin{lstlisting}[style=Myocamlstyle]
+let sub x y = x - y
+let x = 3
+let sub3 = sub x
+let x = 5
+sub3 5 (* evaluates to -2 since 3 - 5 = -1 *)
+\end{lstlisting}
+Because the environment is not modified, and is evaluated with values that existed at the time of the closure's creation, we say that closures use static scope. This term is used in contrast with dynamic scope, where environment variables get updated to match typically top level variables. 
+That is the above example would return \texttt{0} instead of \texttt{-2}. 
+
+\section{Common HOFs}
+Part of the reason why higher order functions (HOFs) are so useful is because it allows us to be modular with out program design, and separate functions from other processes. To see this, consider the following that we say earlier:
+\begin{lstlisting}[style=Myocamlstyle]
+let sub x y = x - y
+let div x y = x / y
+let mystery x y = (x*2)+(y*3)
+let sub3 y = sub y 3
+let div3 y = div y 3
+let double y = mystery y 0
+\end{lstlisting}
+The functions \texttt{sub, div,} and \texttt{mystery} are all non-commutative (the order of inputs matter), so if we want to partially apply the second value, we need to write a new function that takes in a value to do so. Alternatively, we can just make a generic function that partially applies the second value so we don't need to ask for any input.
+\begin{lstlisting}
+let flip f x y = f y x
+let sub3 = flip sub 3
+let div3 = flip div 3
+let double = flip mystery 0
+\end{lstlisting}
+Being able to make similarly structured functions into a generic helps makes things modular, which is important to building good programs and designing good software. 
+So the next sections are about common HOFs which will attempt to make a common function structure generic. 
+
+\subsection{Map}
+Let us consider the following functions: 
+\begin{lstlisting}[style=Myocamlstyle]
+let rec double_items lst = match lst with 
+[] -> []
+|h::t -> (h*2)::(double_items t)
+
+let rec is_even lst = match lst with
+[]->[]
+|h::t -> (if h mod 2 = 0 then true else false)::(is_even t)
+
+let rec neg lst = match lst with
+[] -> []
+|h::t -> (-h)::(neg t) 
+\end{lstlisting}
+All of these functions aim to iterate through a list and modify each item. This is very common need and so instead of creating the above functions to do so, we may want to use this function called \texttt{Map}. Map will \textit{map} the items from the input list (the domain) to a list of new item (co-domain). To take the above function and make it more generic, let us see that is the same across all of them:
+\begin{lstlisting}[style=Myocamlstyle]
+let rec name lst = match lst with
+[] -> []
+|h::t -> (modify h)::(recursive_call t)
+\end{lstlisting}
+If we think about how we modify \texttt{h}, we will realize that we are just applying a function to \texttt{h}. Since it's the function that changes, we probably need to add it as a parameter. So adding this we should get
+\begin{lstlisting}[style=Myocamlstyle]
+let rec map f lst = match lst with 
+[] -> []
+|h::t -> (f h)::(map t)
+\end{lstlisting}
+Fun fact: map actually exists in Ruby (\texttt{[1,2,3].map!\{|x| x+1\})}. Either way, in OCaml and other languages without imperative looping structures, this is a common recursive function that is needed and can be used to modify each item of a list by building a new list of the modified values (recall that everything in OCaml is immutable). 
+Consider the code trace for adding \texttt{1} to each item in a \texttt{int list}. 
+\begin{lstlisting}[style=Myocamlstyle]
+let add1 x = x + 1 in map add1 [1;2;3]
+(*
+map add1 [1;2;3] = (add1 1)::(map add1 [2;3])
+map add1 []2;3] = (add1 2)::(map add1 [3])
+map add1 [3] = (add1 3)::(map add1 [])
+map add1 [] = []
+map add1 [1;2;3] = (add1 1)::(add1 2)::(add1 3)::[]
+map add1 [1;2;3] = 2::3::4::[]
+map add1 [1;2;3] = [2;3;4]
+*)
+\end{lstlisting}
+
+\subsection{Fold}
+While modifying each item in a list is useful, it is not the only common and useful list operation. Consider the following:
+\begin{lstlisting}[style=Myocamlstyle]
+let rec concat lst = match lst with 
+[]-> ""
+|h::t -> h^(concat t)
+ 
+let rec sum lst = match lst with 
+[]-> 0
+|h::t -> h+(sum t)
+ 
+let rec product lst = match lst with 
+[]-> 1
+|h::t -> h*(product t)
+ 
+let rec ands lst = match lst with
+[]-> true
+|h::t -> h && (ands t)
+
+let rec length lst = match lst with 
+[]-> 0
+|_::t -> 1+(length t)
+\end{lstlisting}
+Here we want to take all the items in a list and return a single aggregate value. Doing this process is called folding and there are two common implementations. To start off, we will define define \texttt{fold\_right}. 
+
+\subsubsection{fold\_right}
+So let us find out what each function has in common and then we can figure out what we need to add. 
+\begin{lstlisting}[style=Myocamlstyle]
+let rec name lst = match lst with 
+[] -> base_case
+|h::t -> h operation (recursive_call t)
+\end{lstlisting}
+Taking a look at what we need, we need a base case, and we need an operation. 
+\begin{lstlisting}[style=Myocamlstyle]
+let rec fold_r f lst base = match lst with 
+[] -> base
+|h::t -> f h (fold_r f t b)
+\end{lstlisting}
+Let us first talk about why it's \texttt{f h (fold\_r f t b)}. 
+In looking what was the same, we saw that it was \texttt{h operator (rec\_call t)}. An operator is just a function so 
+we are calling a function with 2 parameters: \texttt{h} and the recursive call \texttt{fold\_r f t b}. 
+
+Some of you may also be wondering what about \texttt{lenth}? It doesn't use \texttt{h}, it uses a constant \texttt{1}. 
+My answer to this is to consider the type of the \texttt{f}. \texttt{f} is a function which takes in 2 parameters, \texttt{h} and the recursive call. I can easily just not use \texttt{h} in the body of \texttt{f}. Consider the following code trace:
+\begin{lstlisting}[style=Myocamlstyle]
+let myfunc h rc = 1 + rc in 
+fold_r myfunc [1;2;3] 0
+(*
+fold_r myfunc [1;2;3] 0 = myfunc 1 (fold_r myfunc [2;3] 0)
+fold_r myfunc [2;3] 0 = myfunc 2 (fold_r myfunc [3] 0)
+fold_r myfunc [3] 0 = myfunc 3 (fold_r myfunc [] 0)
+fold_r myfunc [] 0 = 0
+fold_r myfunc [3] 0 = myfunc 3 0 = 1 + 0 = 1
+fold_r myfunc [2;3] 0 = myfunc 2 1 = 1 + 1 = 2
+fold_r myfunc [1;2;3] 0 = myfunc 1 3 = 1 + 2 = 3
+*)
+\end{lstlisting}
+Notice here that lines 8-10 are just the stack frames all returning and propagating the return value up as stack frames are being popped off the stack. This also happens in \texttt{map} but there's something interesting with \texttt{fold} so I wanted to bring attention to it. That is, notice that if we send in a huge list we can potentially get a stackoverflow error or whatever OCaml's equivalent is. 
+We can actually avoid this stack overflow and minimize the number of stack frames needed through the use of the other way to implement fold: \texttt{fold\_left}. This is the default implementation of fold in most languages afaik so we typically just call this \texttt{fold}. 
+
+\subsubsection{fold\_left}
+See the next section (section \ref{sec:tail}) about why this we can minimize the number of stack frame, but since you already know how fold works, here is \texttt{fold\_left}
+\begin{lstlisting}[style=Myocamlstyle]
+let rec fold f a l = match l with 
+[] -> a
+|h::t -> fold f (f a h) t
+\end{lstlisting}
+I used the variable \texttt{a} instead of base case or whatever because in this variation, the value is going to act as an accumulator. That is, this value is going to be constantly updated with each recursive call. Again see the next section for more about the accumulator. 
+One thing to note is that this will evaluate the items in the list in the reverse order as \texttt{fold\_right}. 
+Consider the code trace for \texttt{fold\_left}, then see them compared together. 
+\begin{lstlisting}
+(* take the sum of the list *)
+let add x y = x + y in 
+fold add 0 [1;2;3;]
+(*
+fold add 0 [1;2;3] = fold add (add 0 1) [2;3] = fold add 1 [2;3] 
+fold add 1 [2;3]  = fold add (add 1 2) [3] = fold add 3 [3]
+fold add 3 [3] = fold add (add 3 3) [] = fold add 6 []
+fold add 6 [] = 6
+*)
+\end{lstlisting}
+Now to compare the order of \texttt{fold\_right} and \texttt{fold\_left} we will use a non-commutative function: subtraction. 
+\begin{lstlisting}
+fold (-) 0 [1;2;3;]
+(*
+fold (-) 0 [1;2;3] = fold (-) ((-) 0 1) [2;3] = fold (-) -1 [2;3] 
+fold (-) -1 [2;3]  = fold (-) ((-) -1 2) [3] = fold (-) -3 [3]
+fold (-) -3 [3] = fold add ((-) -3 3) [] = fold add -6 []
+fold (-) -6 [] = -6
+*)
+(* compare this to fold_right *)
+fold_r (-) [1;2;3] 0
+(*
+fold_r (-) [1;2;3] 0 = (-) 1 (fold_r (-) [2;3] 0)
+fold_r (-) [2;3] 0 = (-) 2 (fold_r (-) [3] 0)
+fold_r (-) [3] 0 = (-) 3 (fold_r (-) [] 0)
+fold_r (-) [] 0 = 0
+fold_r (-) [3] 0 = (-) 3 0 = 3
+fold_r (-) [2;3] 0 = (-) 2 3 = -1
+fold_r (-) [1;2;3] 0 = (-) 1 -1 = 2
+*)
+(* -6 != 2 *)
+\end{lstlisting}
+How interesting. 
+
+\section{Tail Call Optimization}\label{sec:tail}
+
+I was going to make this it's own chapter, but then had logistical questions so for now I decided against it and so I will just put this in the HOF chpater for some reason. 
+
+Let us take a trip back to our 216 days when we learned about stack frames and function calls. 
+One thing I have noticed is that students get weird around recursion but I want you to consider the following 
+\begin{lstlisting}[style=Mycstyle]
+int fact1(int x){
+  if (x == 1)
+    return 1;
+  return -1
+}
+int fact2(int x){
+  if (x == 2)
+    return 2 * fact1(x-1);
+  return -1
+}
+int fact3(int x){
+  if (x == 3)
+    return 3 * fact2(x-1);
+  return -1
+}
+int fact4(int x){
+  if (x == 4)
+    return 4 * fact3(x-1);
+  return -1
+}
+\end{lstlisting}
+Suppose we are on line 18. To evaluate what is returned, we have to call \texttt{fact3}, wait for it's return value, and then use that return value by multiplying it by 4. This is no different than it's recursive equivalent
+\begin{lstlisting}[style=Mycstyle]
+int fact4(int x){}
+    if (x == 1)
+        return 1;
+    if (x <= 4)
+        return x * fact4(x-1);
+    return -1;
+}
+\end{lstlisting}
+The only difference is instead of calling a different function, waiting for it's return value, then using it's return value, we are instead calling ourself, waiting for a return value, then using that return value. 
+
+Great, so now that we know how recursion works, recall how a stack frame is created and pushed onto the memory stack when a function is called and then popped off the memory stack then the function returns. So the difference between something like the non-recursive \texttt{fact4} and the recursive \texttt{fact4}, is which function is being pushed to the stack. 
+
+So Consider what the stack looks like for the recursive \texttt{fact4} if we call \texttt{fact4(3)}
+\begin{lstlisting}[style=Mycstyle]
+//Bottom of Stack//
+3 // push argument on stack
+---start of fact4(3) stack frame---
+return 3 * fact4(2)
+---end of fact4(3) stack frame---
+2 // push argument on stack
+---start of fact4(2) stack frame---
+return 2 * fact4(1)
+---end of fact4(2) stack frame---
+2 // push argument on stack
+---start of fact4(1) stack frame---
+return 1
+---end of fact4(1) stack frame---
+\end{lstlisting}
+Here we are pushing on stack frames when we call the recursive call. Then when finally get to out base case, we can then start popping values off. So popping off the texttt{fact4(1)} call would make the stack look like
+\begin{lstlisting}[style=Mycstyle]
+//Bottom of Stack//
+3 // push argument on stack
+---start of fact4(3) stack frame---
+return 3 * fact4(2)
+---end of fact4(3) stack frame---
+2 // push argument on stack
+---start of fact4(2) stack frame---
+return 2 * 1
+---end of fact4(2) stack frame---
+\end{lstlisting}
+
+When you learned recursion, you probably learned about return values being propagated when teh function returns and this is how you can communicate values from one stack frame to another. This is definitely what happens, but notice that with something like recursive Fibonacci, you will get stack frames being added exponentially and you will get something like a \texttt{stackoverflow} error. 
+\begin{lstlisting}[style=Mycstyle]
+int fib(int x){
+    if(x <= 1)
+        return 1;
+    return fib(x-1) + fib(x-2);
+}
+\end{lstlisting}
+Here the number of stack frames increase at a rate of $2^x$ since each call to \texttt{fib} will push 2 more \texttt{fib} stack frames. 
+
+I think we can all agree that \texttt{Stackoverflow} errors are not good and if we can avoid them, we should. One way to avoid this is to use \textbf{tail call optimization} which would be something a compiler would use to optimize your code. To talk about tail call optimization, let us first talk about what the actual issue is. 
+
+The issue is that there are too many stack frames on the stack and then we run out of memory. There is 2 ways we can solve this issue: 1) add more memory or 2) pop things off the stack. The first solution doesn't really fix the issue, since memory is finite and we can just ask for something like \texttt{fib(10000000)}. The second solution has an issue because we need the old stack frames to exist. However, let us consider why we need the old stack frames. 
+
+In the previous example, we needed the old stack frame because before we could return, we needed the return value of a different stack frame. 
+\begin{lstlisting}[style=Mycstyle]
+//Bottom of Stack//
+// calling fact4(3)
+---------------------------------
+return 3 * fact4(2) 
+//cannot return here since we need to first calculate fact4(2)
+---------------------------------
+return 2 * fact4(1) 
+//cannot return here since we need to first calculate fact4(1)
+---------------------------------
+return 1
+---------------------------------
+\end{lstlisting}
+
+We said earlier that one way to pass in data from one stack frame to another is via the return value. However this is just communication from the callee to the caller. We can pass information from the caller to the callee by via argument values. 
+So let consider this new factorial function:
+\begin{lstlisting}[style=Mycstyle]
+int fact(int n, int a){
+    if(n<=1)
+        return a;
+    return fact(n-1, n*a);
+}
+\end{lstlisting}
+Notice that I added a new argument, \texttt{a}. This new parameter will allow the caller to send in data to the callee during the recursive call. Consider the following trace:
+\begin{lstlisting}[style=Mycstyle]
+//Bottom of Stack//
+// calling fact(3,1)
+---------------------------------
+// fact(3,1)
+return fact(3-1,3*1) // fact(2,3)
+---------------------------------
+// fact(2,3)
+return fact(2-1,2*3) // fact(1,6) 
+---------------------------------
+// fact(1,6)
+return 6
+---------------------------------
+\end{lstlisting}
+Notice here that we get the same value, passing in the work of each stack frame into the next recursive call. What this means is that we no longer need to wait for the recursive call to finish, we can instead pop off stack frames once the recursive call happens. 
+\begin{lstlisting}[style=Mycstyle]
+//Bottom of Stack//
+// calling fact(3,1)
+---------------------------------
+// fact(3,1)
+return fact(3-1,3*1) // fact(2,3)
+
+// we don't need the fact(3,1) stack frame so pop it off and push on fact(2,3) in it's place
+
+//Bottom of Stack//
+// calling fact(2,3)
+---------------------------------
+// fact(2,3)
+return fact(2-1,2*3) // fact(1,6)
+
+// we don't need the fact(2,3) stack frame so pop it off and push on fact(1,6) in it's place
+
+//Bottom of Stack//
+// calling fact(1,6)
+---------------------------------
+// fact(1,6)
+return 6
+
+// got the correct return value
+\end{lstlisting}
+
+So why is this called a tail call optimization and how to we make sure we are tail recursive? 
+To answer this question let us look at the syntax of these recursive calls. 
+\begin{lstlisting}[style=Myocamlstyle]
+int nontailfact(int x)
+    if (x == 1)
+        return 1;
+    return x * nontailfact(x-1);
+}
+
+int tailfact(int n, int a){
+    if(n<=1)
+        return a;
+    return tailfact(n-1, n*a);
+}
+\end{lstlisting}
+
+Where the one major difference is the number of arguments, tail optimization does not care about this. Remember that we care about the behavior of the recursive call. So if we notice the syntax around the recursive call, we can say that we care about what the last thing being calculated is during the recursive call.
+In the \texttt{nontailfact} the last thing being calculated is \texttt{x * nontailfact(x-1)}. In the \texttt{tailfact}, the last thing being calculated is \texttt{tailfact(n-1,n*a)}. 
+This is purely a syntactical (visual) thing so we say that any statement that could be the last thing executed is in \texttt{tail position}. If the recursive call is in tail position, then we can take advantage of tail-call optimization. 
+
+Let us consider the tail position of some OCaml statements.
+\begin{lstlisting}[style=Myocamlstyle]
+3
+4
+"a"
+(* all of these statements are in tail position, since they are the last thing being evaluated *)
+
+2 + 3
+4 * 5
+(* here 2,3,4,5 are not in tail position. The last thing calculated is 2*3, so we say the entire expression is in tail position. This is a tad confusing so let's see something clearer *).
+
+[2+3;5*4;0-1]
+(* here the last thing being evaluated is the creation of the list. So despite 2*3 being the last expression being evaluated, we still need to create the list so the entire expression is again in tail position *)
+
+let x= 3 * 4 in x + 4
+(* the last thing here is x+4 so the expression x + 4 is in tail position *)
+
+let x = 3 + 4 in let x = 6 in 7
+(* consider the syntax we used for a let binding: let v = e1:t1 in e2:t. 
+Here x = v, e1 = 3 + 4, and (let x = 6 in 7) is e2. Here at the top level, (or in broadest context), the expression in tail position is e2 or (let x = 6 in 7). If we changed our context to be more "zoomed in" or "jump in instead of jump over" then things in tail position would be just 7 *)
+\end{lstlisting}
+
+Again this is purely a syntactical thing which depends on the context of which parts of the expression will we consider. In an earlier section, we talked about \texttt{fold\_right} and \texttt{fold\_left}. They both do the same thing(ish), but one of them is tail recursive, and the other is not.
+\end{document}

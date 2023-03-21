@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>CMSC330 - Ocaml Data Types</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/white.css" id="theme">
+		<link rel="stylesheet" href="plugin/highlight/stackoverflow.css">
+
+		<link rel="stylesheet" href="dist/mystyle.css"> 
+	</head>
+
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-auto-animate data-auto-animate-unmatched="fade-up">
+          <h1>CMSC330</h1>
+          <h3>Ocaml Data Types</h3>
+				</section>
+
+				<section data-auto-animate class='fixvert'style="height: 600px">
+					<h3>OCaml Data Types</h3>
+					<div class='fragment tl-diamond' data-fragment-index="1" data-id="1" style="background:purple;top:100px;"></div>
+					<div class='fragment tl-data' data-fragment-index="1" style="top:93px;">Declarative Programming</div>
+
+					<div class='fragment tl' data-fragment-index="2" style="top:140px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="2" data-id="2" style="background:blue;top:180px;"></div>
+					<div class='fragment tl-data' data-fragment-index="2" style="top:173px;">Lets</div>
+
+					<div class='fragment tl' data-fragment-index="3" style="top:220px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="3" data-id="3" style="background:green;top:260px;"></div>
+					<div class='fragment tl-data' data-fragment-index="3" style="top:253px;">Lists and Pattern Matching</div>
+
+					<div class='fragment tl' data-fragment-index="4" style="top:300px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="4" data-id="4" style="background:green;top:340px;"></div>
+					<div class='fragment tl-data' data-fragment-index="4" style="top:333px;">Data Types</div>
+				</section>
+				<section data-auto-animate style="height:600px">
+					<h3>Declarative Programming</h3>
+					<div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+          <section data-auto-animate>
+          <p class='fragment fade-up'>A way of expressing a program's purpose</p>
+          <p class='fragment fade-up'>Don't really care how</p>
+          </section>
+          <section data-auto-animate>
+          <p class='fragment fade-up'>Consider the iterative:</p>
+          <pre style='width:300px'><code class='fragment' data-trim data-line-numbers>
+(* iterative.rb *)
+arr = [1,2,3]
+res = []
+for i in arr
+  if i % 2 == 0 
+    res.push(i)
+  end
+end
+res
+          </code></pre>
+          <p class='fragment fade-up'>Tells you what to do</p>
+          <p class='fragment fade-up'>Series of steps to achieve your goal</p>
+          </section>
+          <section data-auto-animate>
+          <p class='fragment fade-up'>Consider the declarative:</p>
+          <pre ><code class='fragment' data-trim data-line-numbers>
+(* declare.rb *)
+arr = [1,2,3] in
+arr.filter{|x| x%2==0}
+          </code></pre>
+          <p class='fragment fade-up'>Tells you what you want</p>
+          <p class='fragment fade-up'>Does not care how, just the end result</p>
+          <p class='fragment fade-up'>Focus on what you want, and don't worry about the specifics</p>
+          </section>
+          <section data-auto-animate>
+          <p>Focus on what you want, and don't worry about the specifics</p>
+          <p class='fragment fade-up'>Function: input to output</p>
+          <p class='fragment fade-up'>Combine functions to get what you want</p>
+          <p class='fragment fade-up'>Either recursively or combination of functions</p>
+          </section>
+        </section>
+
+				<section data-auto-animate style="height:600px;">
+					<h3>Let expressions</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="background:blue;bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+          <section data-auto-animate>
+          <h5>Let Expressions</h5>
+          <pre style='width:350px'><code class='fragment' data-trim data-line-numbers>
+(* let.ml *)
+let x = e1 in e2
+          </code></pre>
+          <ul>
+          <li class='fragment fade-up'>Let expressions are not the same as let definitions</li>
+          <li class='fragment fade-up'>Bind local variables for e2</li>
+          <li class='fragment fade-up'>Scope is only for the body</li>
+          </ul>
+          <p class='fragment fade-up'>Let expressions are expressions</p>
+          <p class='fragment fade-up'>Expressions have a type</p>
+          <pre style='width:450px'><code class='fragment' data-trim data-line-numbers>
+(* let-type.ml *)
+(let x = e1:t1 in e2:t2):t2
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>Let Expressions</h5>
+          <p>Can be nested</p>
+          <pre style='width:500px'><code class='fragment' data-trim data-line-numbers>
+(* let-nest.ml *)
+let x = 3 in let y = 4 in x + y
+          </code></pre>
+          <p class='fragment fade-up'>Can be used for local variables</p>
+          <pre style='width:350px'><code class='fragment' data-trim data-line-numbers>
+(* let-vars.ml *)
+let area r = 
+  let pi = 3.14 in
+  pi *. r *. r
+          </code></pre>
+          <p class='fragment fade-up'>Variables will be shadowed</p>
+          <pre style='width:500px'><code class='fragment' data-trim data-line-numbers>
+(* let-shadowing.ml *)
+let x = 3 in let x = 5 in x + 4
+          </code></pre>
+          </section>
+        </section>
+
+				<section data-auto-animate style="height:600px">
+					<h3>Lists and Pattern Matching</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="background:green;bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+          <section data-auto-animate>
+          <p>Lists are the basic data structure in OCaml</p>
+          <ul>
+          <li class='fragment fade-up'>Arbitrary Length</li>
+          <li class='fragment fade-up'>Homogenous</li>
+          <li class='fragment fade-up'>Implemented as a Linked List</li>
+          <li class='fragment fade-up'>Can be constructed and deconstructed</li>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <p>Lists are the basic data structure in OCaml</p>
+          <pre style='width:300px'><code class='fragment' data-trim data-line-numbers>
+(* lists.ml *)
+[1;2;3;4;5]
+          </code></pre>
+          <ul>
+          <li class='fragment fade-up'><tt>;</tt> as seperator</li>
+          <li class='fragment fade-up'>Bracket Syntax</li>
+          <li class='fragment fade-up'>No indexing</li>
+          </ul>
+          <p class='fragment fade-up'>List Creation</p>
+          <pre style='width:300px'><code class='fragment' data-trim data-line-numbers>
+(* lists-1.ml *)
+e1::e2::[]
+          </code></pre>
+          </section>
+
+          <section data-auto-animate>
+          <p>Lists are the basic data structure in OCaml</p>
+          <pre style='width:300px'><code data-trim data-line-numbers>
+(* lists-1.ml *)
+e1::e2::[]
+          </code></pre>
+          <ul>
+          <li class='fragment fade-up'><tt>[]</tt>- empty list (nil)</li>
+          <li class='fragment fade-up'><tt>::</tt>- cons</li>
+          <li class='fragment fade-up'>A list has a Head and Tail</li>
+          </ul>
+          <p class='fragment fade-up'>Have type <tt>list</tt></p>
+          <p class='fragment fade-up'>When evaluating, go right to left</p>
+          </section>
+          <section data-auto-animate>
+          <h5>Pattern Matchitng</h5>
+          <p>Can deconstruct lists</p>
+          <pre style='width:500px'><code class='fragment' data-trim data-line-numbers>
+(* match-nest.ml *)
+let x = [1;2;3] in match x with
+|[] -> true
+|h::t -> false
+          </code></pre>
+          <p class='fragment fade-up'>Match looks at patterns of structure</p>
+          </section>
+          <section data-auto-animate>
+          <h5>Pattern Matching</h5>
+          <p>Match looks at patterns of structure</p>
+          <p class='fragment fade-up'>Common Patterns</p>
+          <pre style='width:650px'><code class='fragment' data-trim data-line-numbers=|3|4|5|6|>
+(* match-patterns.ml *)
+let empty x = in match x with
+|[] -> true (* empty *)
+|a::[] -> false (* list of size 1 *)
+|h::t -> false (* list at least size 1 *)
+|_ -> false (* wildcard *)
+          </code></pre>
+          <p class='fragment fade-up'>Variables are bound on order</p>
+          <p class='fragment fade-up'>Last item is a <tt>list</tt></p>
+          </section>
+          <section data-auto-animate>
+          <h5>Pattern Matching</h5>
+          <p>Match looks at patterns of structure</p>
+          <p class='fragment fade-up'>Can be put as argument</p>
+          <pre style='width:400px'><code class='fragment' data-trim data-line-numbers>
+(* match-function.ml *)
+let car (h::_) = h;;
+let cdr (_::t) = t;;
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>Pattern Matching</h5>
+          <p>Match looks at patterns of structure</p>
+          <p class='fragment fade-up'>Can be Polymorphic</p>
+          <pre style='width:550px'><code class='fragment' data-trim data-line-numbers=2-5|7-10>
+(* match-polymorphic.ml *)
+let car lst = match lst with 
+[] -> []
+h::_ -> h;;
+(* lst has type 'a list *)
+
+let rec sum lst = match lst with
+[]-> 0
+|h::t -> h + sum t;;
+(* h has type int list *)
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>Pattern Matching</h5>
+          <p>Used commonly in recursive functions</p>
+          <pre style='width:600px'><code class='fragment' data-trim data-line-numbers=2-4|6-8|10-12|14-22>
+(* match-rec-functions.ml *)
+let rec sum lst = match lst with
+[]-> 0
+|h::t -> h + sum t;;
+
+let rec negate lst = match lst with
+[]-> []
+|h::t -> -h + negate t;;
+
+let rec last lst = match lst with
+[x]-> x
+|h::t -> last t;;
+
+let rec append l m = match l with
+[]-> m
+|h::t -> x :: (append t m)
+
+let rec rev l = match l with
+|[] -> []
+| h::t -> append (rev t) (h::[])
+(* rev is O(n^2) *)
+(* can you do better? *)
+          </code></pre>
+          </section>
+        </section>
+
+
+
+				<section data-auto-animate style="height:600px">
+					<h3>Data Types</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="background:green;bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+          <section data-auto-animate>
+          <h5>Tuples</h5>
+          <p class='fragment fade-up'>Like Lists, but not really</p>
+          <pre style='width:250px'><code class='fragment' data-trim data-line-numbers>
+(* tuples.ml *)
+(1,2)
+          </code></pre>
+          <ul>
+          <li class='fragment fade-up'>Surrounded with <tt>()</tt></li>
+          <li class='fragment fade-up'>Seperated with <tt>,</tt></li>
+          <li class='fragment fade-up'>Heterogenous</li>
+          <li class='fragment fade-up'>Fixed size</li>
+          </ul>
+          </section>
+
+          <section data-auto-animate>
+          <h5>Tuples</h5>
+          <p>Tuples have a set Type</p>
+          <pre style='width:700px'><code class='fragment' data-trim data-line-numbers>
+(* tuples-type.ml *)
+(1,2) (* int * int *)
+(1,"string",2.3) (* int * string * float *)
+('a','b') (* char * char *)
+['a';'b'] (* char list *)
+[(1,2);(3,4)] (* (int * int) list *)
+([1;2],[3;4]) (* int list * int list *)
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>Tuples</h5>
+          <p>Can Pattern Match</p>
+          <pre style='width:700px'><code class='fragment' data-trim data-line-numbers>
+(* tuples-match.ml *)
+let add t = match t with
+(a,b) -> a + b
+          </code></pre>
+          <p class='fragment'>Remember Tuples have a type based on size</p>
+          <pre style='width:700px'><code class='fragment' data-trim data-line-numbers>
+(* tuples-match-err.ml *)
+let add t = match t with
+(a,b) -> a + b
+|(a,b,c) -> a + b + c
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>Records</h5>
+          <p>Like a weird hash</p>
+          <pre style='width:800px'><code class='fragment' data-trim data-line-numbers>
+(* records.ml *)
+type data = { month: string; dat: int; year: int };;
+let today = { day=29; year=2020; month="feb"};;
+          </code></pre>
+          <p class='fragment'>O in OCaml stands for Object</p>
+          <pre style='width:400px'><code class='fragment' data-trim data-line-numbers>
+(* record-access-1.ml *)
+print_string today.month
+          </code></pre>
+          <p class='fragment'>Can also pattern match</p>
+          <pre style='width:550px'><code class='fragment' data-trim data-line-numbers>
+(* record-access-2.ml *)
+let { month=_; day = d} = today in
+print_int d
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>User Defined Types</h5>
+          <p class='fragment fade-up'>We just saw this syntax</p>
+          <pre style='width:800px'><code class='fragment' data-trim data-line-numbers>
+(* ud-types-alias.ml *)
+type ilist = int list;;
+let f x:ilist = [1;2;3;4];;
+          </code></pre>
+          <ul>
+          <li class='fragment fade-up'>Like a <tt>typedef</tt></li>
+          <li class='fragment fade-up'><tt>type</tt> keyword will allow for an alias</li>
+          </ul>
+          <ul>
+          <p class='fragment fade-up'>Ultimately not really useful in this form</p>
+          </section>
+          <section data-auto-animate>
+          <p>Variant Types are more useful</p>
+          <pre style='width:800px'><code class='fragment' data-trim data-line-numbers>
+(* ud-variants.ml *)
+type parity = Even | Odd 
+          </code></pre>
+          <p class='fragment fade-up'>Like an <tt>enum</tt></p>
+          <pre style='width:400px'><code class='fragment' data-trim data-line-numbers>
+(* pm-variants.ml *)
+let swap x = match x with
+Even -> Odd
+|Odd -> Even
+          </code></pre>
+          <ul>
+          <p class='fragment fade-up'>Can be Pattern Matched</p>
+          </section>
+          <section data-auto-animate>
+          <p>Can Hold Data</p>
+          <pre style='width:800px'><code class='fragment' data-trim data-line-numbers>
+(* ud-variants-1.ml *)
+type parity = Even of int | Odd of int
+          </code></pre>
+          <p class='fragment fade-up'>Can still be Pattern Matched</p>
+          <pre style='width:400px'><code class='fragment' data-trim data-line-numbers>
+(* pm-variants-1.ml *)
+let add x = match x with
+Even(x) -> Odd(x+1)
+|Odd(x) -> Even(x+1)
+          </code></pre>
+          <ul>
+          </section>
+          <section data-auto-animate>
+          <p>Can Hold Data</p>
+          <p>Can be different</p>
+          <pre style='width:800px'><code class='fragment' data-trim data-line-numbers>
+(* ud-variants-2.ml *)
+type shape = Rect of int * int | Circle of float 
+          </code></pre>
+          <p class='fragment fade-up'>Can still be Pattern Matched</p>
+          <pre style='width:600px'><code class='fragment' data-trim data-line-numbers>
+(* pm-variants-2.ml *)
+let area s = match s with
+Rect (w,l) -> float_of_int (w*l)
+|Circle r  -> r *. r *. 3.14
+          </code></pre>
+          <ul>
+          </section>
+          <section data-auto-animate>
+          <p>Can be Recursive</p>
+          <pre style='width:700px'><code class='fragment' data-trim data-line-numbers>
+(* llist.ml *)
+type linked = 
+Item of string * linked
+|Null;;
+
+let head lst = match lst with
+Item(x,_) -> x
+|Null -> "";;
+
+head (Item("Hello",Item("world", Null)));;
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <p>Can be generic </p>
+          <pre style='width:300px'><code class='fragment' data-trim data-line-numbers>
+(* some_none.ml *)
+type 'a option = 
+Some of 'a
+|None
+          </code></pre>
+          <p class='fragment fade-up'>Built into OCaml</p>
+          </section>
+        </section>
+      </div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/math/math.js"></script>
+    <script src="plugin/search/search.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+		<script>
+     Reveal.configure({
+        keyboard: {
+          40: 'next', // go to the next slide with down arrow
+          38: 'prev', // go to the next slide with up arrow
+        }
+      });
+			Reveal.initialize({
+				center: true,
+				hash: true,
+        controlsTutorial: false,
+        showSlideNumber: 'print',
+        pdfSeparateFragments: false,
+				math: {
+					// mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+					config: 'TeX-AMS_HTML-full',
+					TeX: {
+						Macros: {
+							R: '\\mathbb{R}',
+							set: [ '\\left\\{#1 \\; ; \\; #2\\right\\}', 2 ]
+						}
+					}
+				},
+				plugins: [ RevealHighlight, RevealMarkdown, RevealMath, RevealSearch, RevealZoom ]
+
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,98 @@
+\documentclass[10pt]{book} % [10pt]
+
+% math stuff
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage[hidelinks]{hyperref}
+
+\usepackage{subfiles}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+
+
+\lstdefinestyle{numbers} {
+    numbers=left,
+    stepnumber=1,
+    numbersep=10pt
+}
+    
+\lstdefinestyle{spacing} {
+    showstringspaces=false,
+    tabsize=1,
+    breaklines=true,
+    breakatwhitespace=false
+}
+\lstdefinestyle{colors}{
+    basicstyle=\ttfamily\color{black},
+    commentstyle = \ttfamily\color{gray},
+    keywordstyle=\ttfamily\color{blue},
+    stringstyle=\color{green},
+}
+\lstdefinestyle{base} {
+    style=spacing,
+    style=numbers,
+    style=colors
+}
+
+\lstdefinestyle{MyRubyStyle} {language=Ruby,style=base,morekeywords={puts}, }
+\lstdefinestyle{MyCStyle} {language=C,style=base}
+\lstdefinestyle{MyJavaStyle} {language=Java,style=base}
+\lstdefinestyle{MyOcamlStyle}{language=[Objective]Caml, style=base}
+
+\lstset{language=Ruby,frame=none}
+\lstset{language=Java,frame=none}
+\lstset{language=C,frame=none}
+\lstset{language=[Objective]Caml, frame=none}
+
+%\usepackage{arev}
+
+%\usepackage{fourier}
+
+\usepackage[sfdefault,scaled=.85]{FiraSans}
+\usepackage{newtxsf}
+
+\usepackage{epigraph}
+
+\usepackage[table,dvipsnames]{xcolor}
+%\usepackage{colortbl}
+\usepackage[breakable,most,skins]{tcolorbox}
+
+\usepackage{tikz,calc}
+\usetikzlibrary{tikzmark,arrows}
+\usepackage{circuitikz}
+\usepackage[scaled=0.85]{beramono}
+\newcommand{\cout}[1]{\texttt{\textbf{'#1'}}}
+
+\usepackage[titletoc]{appendix}
+\usepackage{float,relsize,setspace,enumitem,pbox,cleveref,multicol,multirow}
+% \usepackage[margin=1in]{geometry}
+\title{CMSC330 Notes}
+\author{Cliff }
+\date{}
+
+\begin{document}
+
+\maketitle
+\begingroup
+\let\cleardoublepage\clearpage
+\tableofcontents
+\endgroup
+\subfile{intro.tex}
+\subfile{ruby.tex}
+\subfile{regex.tex}
+% \subfile{recursion.tex}
+\subfile{ocaml.tex}
+\subfile{HOF.tex}
+
+% \subfile{closures}
+\subfile{FA.tex}
+%\subfile{CFGS.tex}
+%\subfile{parsing.tex}
+%\subfile{opsem.tex}
+%\subfile{lambdacalc.tex}
+% \subfile{rust}
+% \subfile{garbage.tex}
+% \subfile{appendex.tex}
+
+\end{document}

@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>CMSC330 - Higher Order Functions</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/white.css" id="theme">
+		<link rel="stylesheet" href="plugin/highlight/stackoverflow.css">
+
+		<link rel="stylesheet" href="dist/mystyle.css"> 
+	</head>
+
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-auto-animate data-auto-animate-unmatched="fade-up">
+          <h1>CMSC330</h1>
+          <h3>Higher Order Functions</h3>
+				</section>
+
+				<section data-auto-animate class='fixvert'style="height: 600px">
+					<h3>Higher Order Functions</h3>
+					<div class='fragment tl-diamond' data-fragment-index="1" data-id="1" style="background:purple;top:100px;"></div>
+					<div class='fragment tl-data' data-fragment-index="1" style="top:93px;">Higher Order Programming</div>
+
+					<div class='fragment tl' data-fragment-index="2" style="top:140px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="2" data-id="2" style="background:blue;top:180px;"></div>
+					<div class='fragment tl-data' data-fragment-index="2" style="top:173px;">Higher Order Functions</div>
+
+					<div class='fragment tl' data-fragment-index="3" style="top:220px;"></div>
+					<div class='fragment tl-diamond' data-fragment-index="3" data-id="3" style="background:green;top:260px;"></div>
+					<div class='fragment tl-data' data-fragment-index="3" style="top:253px;">Map and Fold</div>
+				</section>
+
+				<section data-auto-animate class='fixvert' style="height:600px;">
+					<h3>Higher Order Programming</h3>
+					<div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+        </section>
+
+				<section data-auto-animate style="height:600px;">
+					<h3>Higher Order Programming</h3>
+					<div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+          <section data-auto-animate>
+          <p>Recall Code blocks and Procs in Ruby</p>
+          <pre style='width:400px'><code class='fragment' data-trim data-line-numbers>
+p = Proc.new {|x| x + 1}
+          </code></pre>
+          <p class='fragment fade-up'>We can pass procs in as arguments</p>
+          <pre style='width:400px'><code class='fragment' data-trim data-line-numbers>
+p = Proc.new {|x| x + 1}
+def f(x)
+  puts x.call(3)
+end
+          </code></pre>
+          <p class='fragment fade-up'>Treating code and functions as data</p>
+          <p class='fragment fade-up'>We can do this and more in OCaml</p>
+          </section>
+        </section>
+
+				<section data-auto-animate style="height:600px">
+					<h3>Higher Order Functions</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="background:blue;bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+          <section data-auto-animate>
+          <h5>Anonymous Functions</h5>
+          <p class='fragment fade-up'>Anonymous function: function not bound to a variable</p>
+          <p class='fragment fade-up'>Syntax: <tt>fun x1 ... xn -> e</tt></p>
+          <pre style='width:300px'><code class='fragment' data-trim data-line-numbers>
+fun x -> x + 3
+          </code></pre>
+          <p class='fragment fade-up'>Technically functions are anonymous functions with syntactic sugar</p>
+          <pre style='width:400px'><code class='fragment' data-trim data-line-numbers>
+let add3 = fun x -> x + 3
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <p>Recall Referential Transparency</p>
+          <p class='fragment fade-up'>Functions are expressions</p>
+          <pre style='width:400px'><code class='fragment' data-trim data-line-numbers>
+(* function_call.ml *)
+let add3 x = x + 3;;
+let add3 = fun x -> x + 3;;
+add3 4;;
+(fun x -> x + 3) 4;;
+          </code></pre>
+          <p class='fragment fade-up'>So treat them like expressions</p>
+          <pre style='width:300px'><code class='fragment' data-trim data-line-numbers>
+let plus3 = add3;;
+plus3 4;;
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <p>Can pass in functions as arguments</p>
+          <pre style='width:630px'><code class='fragment' data-trim data-line-numbers>
+(* function_application.ml *)
+let apply f x = f x;;
+(* type syntax: ('a -> 'b) -> 'a -> 'b *)
+let sub3 x = x - 3;;
+apply_to_int add3 4;;
+apply_to_int sub3 4;;
+          </code></pre>
+          <p class='fragment fade-up'>Recall Functions have types</p>
+          <pre style='width:500px'><code class='fragment' data-trim data-line-numbers>
+(* function_types.ml *)
+let apply_to_int f x = f (x+1);;
+          </code></pre>
+          <p class='fragment fade-up'>Only functions of type <tt>int -> 'a</tt></p>
+          <pre style='width:700px'><code class='fragment' data-trim data-line-numbers>
+apply_to_int (fun x -> x +. 3) 4 (* error *)
+          </code></pre>
+          </section>
+        </section>
+
+				<section data-auto-animate style="height:600px">
+					<h3>Map and Fold</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="background:green;bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+          <section data-auto-animate>
+          <h5>Map</h5>
+          <p class='fragment fade-up'>Common and useful HOFs exist</p>
+          <pre style='width:500px'><code class='fragment' data-trim data-line-numbers>
+let rec map f l = match l with
+[]-> []
+|h::t -> (f h)::(map f t)
+          </code></pre>
+          <pre style='width:600px'><code class='fragment' data-trim data-noescape>
+map: ('a -> 'b) -> 'a list -> 'b list
+          </code></pre>
+          <ul>
+          <li class='fragment fade-up'>take in a function and a list</li>
+          <li class='fragment fade-up'>The list can be thought as the domain</li>
+          <li class='fragment fade-up'>the function is applied to each item in the domain</li>
+          <li class='fragment fade-up'>Returns new list of corresponding output</li>
+          <li data-id="6" class='fragment fade-up'>Basically maps domain to co-domain</li>
+          </ul>
+          </section>
+          <section data-auto-animate>
+          <h5>Map</h5>
+          <p data-id="6">Basically maps domain to co-domain</p>
+          <pre style='width:500px'><code class='fragment' data-trim data-line-numbers>
+let rec map f l = match l with
+[]-> []
+|h::t -> (f h)::(map f t)
+          </code></pre>
+          <pre style='width:500px'><code class='fragment' data-trim data-line-numbers=2-4|5-8|9-10>
+(* map.ml *)
+let add1 x = x + 1;;
+let x2 x = x + x;;
+let is_even x = x mod 2 = 0;;
+let lst = [1;2;3];;
+map add1 lst;;
+map x2 lst;;
+map is_even lst;;
+let fs = [add1;x2;(fun x -> -x)]
+map (fun f -> map f lst) fs;;
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <p class='fragment fade-up'>Consider the following family of functions</p>
+          <pre style='width:800px'><code class='fragment' data-trim data-noescape data-line-numbers=2-4|6-8|10-12|14-16|18-20|22-26|>
+(* ff.ml *)
+let rec concat lst = match lst with 
+[]-> ""
+|h::t -> h^(concat t)
+
+let rec sum lst = match lst with 
+[]-> 0
+|h::t -> h+(sum t)
+
+let rec product lst = match lst with 
+[]-> 1
+|h::t -> h*(productt)
+
+let rec length lst = match lst with 
+[]-> 0
+|_::t -> 1+(length t)
+
+let rec rev lst = match lst with 
+[]-> []
+|h::t -> (rev t) @ [h];;
+
+let rec filter lst compare_fun = match lst with 
+[]-> []
+|h::t -> if compare_fun h then 
+          h::(filter t compare_fun) else 
+          filter t compare_fun;;
+          </code></pre>
+          <p class='fragment fade-up'>Aggregates a list to a single value</p>
+          </section>
+          <section data-auto-animate>
+          <h5>Fold</h5>
+          <p class='fragment fade-up'>Consider the following Fibinocci</p>
+          <pre style='width:800px'><code class='fragment' data-trim data-noescape data-line-numbers>
+(* fib.ml *)
+let rec fib n = 
+if n < 2 then 1 else (fib (n-1)) - (fib (n-2));;
+          </code></pre>
+          <ul>
+          <li class='fragment fade-up'>imperfect compiler: too many stack frames</li>
+          <li class='fragment fade-up'>Not tail Recursive</li>
+          </ul>
+          <p class='fragment fade-up'>Let's fix this</p>
+          <pre style='width:800px'><code class='fragment' data-trim data-noescape data-line-numbers>
+(* fib-1.ml *)
+let rec fib n a b = 
+if n = 0 then a else fib (n-1) (a+b) a;;
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>Fold</h5>
+          <p class='fragment fade-up'><tt>Fold</tt> will incorporate</p>
+          <ul>
+          <li class='fragment fade-up'>Aggregating a list to a single value</li>
+          <li class='fragment fade-up'>Reducing Stack Frames</li>
+          </ul>
+          <pre style='width:500px'><code class='fragment' data-trim data-noescape data-line-numbers>
+(* fold.ml *)
+let rec fold f a l= match l with 
+[]-> a
+|h::t-> fold f (f a h) t;;
+          </code></pre>
+          <pre style='width:700px'><code class='fragment' data-trim data-noescape>
+fold: ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <h5>Foldr</h5>
+          <p class='fragment fade-up'><tt>Foldr</tt> only uses</p>
+          <ul>
+          <li class='fragment fade-up'>Aggregating a list to a single value</li>
+          </ul>
+          <p class='fragment fade-up'>But, the order of evaluation is reversed</p>
+          <pre style='width:530px'><code class='fragment' data-trim data-noescape data-line-numbers>
+(* foldr.ml *)
+let rec foldr f l a = match l with 
+[]-> a
+|h::t-> f h (foldr f t a);;
+          </code></pre>
+          <pre style='width:700px'><code class='fragment' data-trim data-noescape>
+foldr: ('b -> 'a -> 'a) -> 'b list -> 'a -> 'a
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <pre style='width:530px'><code data-trim data-noescape data-line-numbers>
+(* fold.ml *)
+let rec fold f a l= match l with 
+[]-> a
+|h::t-> fold f (f a h) t;;
+          </code></pre>
+          <pre style='width:530px'><code data-trim data-noescape data-line-numbers>
+(* foldr.ml *)
+let rec foldr f l a = match l with 
+[]-> a
+|h::t-> f h (foldr f t a);;
+          </code></pre>
+          <p class='fragment fade-up'>Be careful with non-commutative functions</p>
+          <pre style='width:700px'><code class='fragment' data-trim data-noescape>
+let diff x y = x - y in 
+(fold diff 0 [1;2;3]) = (foldr diff [1;2;3] 0);;
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <pre style='width:710px'><code class='fragment' data-trim data-noescape>
+let rec fold f a l = match l with
+[]-> a 
+|h::t-> fold f (f a h) t
+          </code></pre>
+          <pre style='width:710px'><code class='fragment' data-trim data-noescape>
+(* fold.ml *)
+let concat a h = a^h;;
+let sum a h = a + h;;
+let product a h = a * h;;
+let length a _ = a + 1;;
+let rev a h = a @ [h];;
+let filter f lst = 
+let filter_helper a h = if f h then h::a else a in
+fold filter_helper [] lst;;
+let is_even x = x mod 2 = x;;
+filter is_even [1;2;3;4;5];;
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <p>We can use map and fold together for cool stuff</p>
+          <p class='fragment fade-up'>Can we count 1s in a 2d matrix?</p>
+          <pre style='width:700px'><code class='fragment' data-trim data-noescape>
+(* count 1s in a 2d matrix *)
+(* based on what we already have (inefficent) *)
+let countones lst =
+(* take out non-ones from 1-d list *)
+let get1s lst = filter (fun x -> x = 1) lst in
+(* take out non-ones from each sublist *)
+let ones = map get1s lst in
+(* get the length of each 1 list *)
+let counts = map (fold length 0) ones in
+(* add up the lengths *)
+let total = fold sum 0 counts in total;;
+val countones : int list list -> int = <fun>
+
+(* or we can do the easy way *)
+let count1 lst = fold (fun a h -> if h = 1 then a+1 else a) 0 lst;;
+let count1s lst = fold (+) 0 (map count1 lst)
+          </code></pre>
+          <p class='fragment fade-up'>How could we rotate a matrix?</p>
+          </section>
+        </section>
+      </div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/math/math.js"></script>
+    <script src="plugin/search/search.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+		<script>
+     Reveal.configure({
+        keyboard: {
+          40: 'next', // go to the next slide with down arrow
+          38: 'prev', // go to the next slide with up arrow
+        }
+      });
+			Reveal.initialize({
+				center: true,
+				hash: true,
+        controlsTutorial: false,
+        showSlideNumber: 'print',
+        pdfSeparateFragments: false,
+				math: {
+					// mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+					config: 'TeX-AMS_HTML-full',
+					TeX: {
+						Macros: {
+							R: '\\mathbb{R}',
+							set: [ '\\left\\{#1 \\; ; \\; #2\\right\\}', 2 ]
+						}
+					}
+				},
+				plugins: [ RevealHighlight, RevealMarkdown, RevealMath, RevealSearch, RevealZoom ]
+
+			});
+		</script>
+	</body>
+</html>
