@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>CMSC330 - Parsers</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/white.css" id="theme">
+  <link rel="stylesheet" href="plugin/highlight/stackoverflow.css">
+
+  <link rel="stylesheet" href="dist/mystyle.css">
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section data-auto-animate data-auto-animate-unmatched="fade-up">
+        <h1>CMSC330</h1>
+        <h3>Operational Semantics</h3>
+      </section>
+
+      <section data-auto-animate class='fixvert' style="height: 600px">
+        <h3>Operational Semantics</h3>
+        <div class='fragment tl-diamond' data-fragment-index="1" data-id="1" style="background:purple;top:100px;"></div>
+        <div class='fragment tl-data' data-fragment-index="1" style="top:93px;">Semantics</div>
+
+        <div class='fragment tl' data-fragment-index="2" style="top:140px;"></div>
+        <div class='fragment tl-diamond' data-fragment-index="2" data-id="2" style="background:blue;top:180px;"></div>
+        <div class='fragment tl-data' data-fragment-index="2" style="top:173px;">Operational Semantics</div>
+
+        <div class='fragment tl' data-fragment-index="3" style="top:220px;"></div>
+        <div class='fragment tl-diamond' data-fragment-index="3" data-id="3" style="background:green;top:260px;"></div>
+        <div class='fragment tl-data' data-fragment-index="3" style="top:253px;">OpSem of OCaml</div>
+
+        <div class='fragment tl' data-fragment-index="4" style="top:300px;"></div>
+        <div class='fragment tl-diamond' data-fragment-index="4" data-id="4" style="background:orange;top:340px;"></div>
+        <!-- <div class='fragment tl-data' data-fragment-index="4" style="top:333px;">Definitional Interpreter</div> -->
+      </section>
+
+      <section data-auto-animate class='fixvert' style="height:600px;">
+        <h3>Semantics</h3>
+        <div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+        <div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+        <div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+        <div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+      </section>
+
+      <section data-auto-animate style="height:600px;">
+        <h3>Semantics</h3>
+        <div class='tl-circle' data-id="1" style="background:purple;bottom:10px;"></div>
+        <div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+        <div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+        <div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+        <section data-auto-animate>
+          <p>Semantics: <span class='fragment fade-up'>The meaning of a phrase</span></p>
+          <pre style='width:300px;'><code class='fragment' data-trim data-line-numbers>
+//java
+int x = 2 + 3;
+(* ocaml *)
+let x = 2 + 3;;
+# ruby
+x = 2 = 3;;
+// go
+x := 2 = 3
+// javascript
+var x = 2 +3;
+          </code></pre>
+          <p class='fragment fade-up'>5 Idioms, 1 'semantic'</p>
+        </section>
+        <section data-auto-animate>
+          <ul>
+            <li class='fragment fade-up'>Denotational Semantics<span class='fragment fade-up'>: Describe meanings
+                through mathematical constructs</span></li>
+            <li class='fragment fade-up'>Axiomatic Semantics<span class='fragment fade-up'>: Describe meanings through
+                promises</span></li>
+            <li class='fragment fade-up'>Operational Semantics<span class='fragment fade-up'>: Describe meanings through
+                how things execute</span></li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <ul>
+            <li>Denotational Semantics<span>: Describe meanings through mathematical constructs</span></li>
+            <li>Axiomatic Semantics<span>: Describe meanings through promises</span></li>
+            <li>Operational Semantics<span>: Describe meanings through how things execute</span></li>
+            <ul>
+              <li>Helpful for making interpreters</li>
+            </ul>
+          </ul>
+        </section>
+      </section>
+
+      <section data-auto-animate style="height:600px">
+        <h3>Operational Semantics</h3>
+        <div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+        <div class='tl-circle' data-id="2" style="background:blue;bottom:-10px;"></div>
+        <div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+        <div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+        <section data-auto-animate>
+          <p>OpSem ultimately creates a proof of correctness or properties</p>
+          <p class='fragment fade-up'>Syntax for this class:</p>
+          <ul>
+            <li class='fragment fade-up'>Value: \(v\)</li>
+            <li class='fragment fade-up'>Expression: \(e\)</li>
+            <li class='fragment fade-up'>Environment: \(A\)</li>
+          </ul>
+          <p class='fragment fade-up'>Goal: create a defitional interpreter</p>
+        </section>
+      </section>
+
+      <section data-auto-animate style="height:600px">
+        <h3>Opsem of OCaml</h3>
+        <div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+        <div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+        <div class='tl-circle' data-id="3" style="background:green;bottom:-30px;"></div>
+        <div class='tl-circle' data-id="4" style="bottom:-50px;"></div>
+        <section data-auto-animate>
+          <p>We will create rules for how an ocaml program will execute</p>
+          <p class='fragment fade-up'>Suppose our languge is small: only numbers</p>
+          <pre style='width:300px;'><code class='fragment' data-trim>
+(* Grammar *)
+E -> n
+          </code></pre>
+          <p class='fragment fade-up'>An interpreter needs a rule of what an expression returns</p>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <p>An interpreter needs a rule of what an expression returns</p>
+          <p class='fragment fade-up'>\(e \Rightarrow v\)</p>
+          <ul>
+            <li class='fragment fade-up'>Where \(e := n\)</li>
+            <li class='fragment fade-up'>Where \(v := n\)</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <p>Let us add addition to our language</p>
+          <pre style='width:300px;'><code class='fragment' data-trim>
+(* Grammar *)
+E -> n| E + E
+          </code></pre>
+          <p class='fragment fade-up'>\(e \Rightarrow v\)</p>
+          <ul>
+            <li class='fragment fade-up'>Where \(e := n|e+e\)</li>
+            <li class='fragment fade-up'>Where \(v := n\)</li>
+          </ul>
+        </section>
+        <section data-auto-animate>
+          <pre style='width:300px;'><code data-trim>
+(* Grammar *)
+E -> n| E + E
+          </code></pre>
+          <p>\(e \Rightarrow v\)</p>
+          <ul>
+            <li class='fragment fade-up'>If \(e\) is a number \(n\) then \(n \Rightarrow n\)</li>
+            <li class='fragment fade-up'>If \(e\) is an expression of \(e_1 + e_2\) then </li>
+            <ul>
+              <li class='fragment fade-up'>if \(e_1 \Rightarrow n_1\)</li>
+              <li class='fragment fade-up'>if \(e_2 \Rightarrow n_2\)</li>
+              <li class='fragment fade-up'>if \(n_1 + n_2 = n_3\)</li>
+              <li class='fragment fade-up'>then \(e \Rightarrow n_3\)</li>
+            </ul>
+          </ul>
+          <p class='fragment fade-up'>This is an argument structure</p>
+        </section>
+        <section data-auto-animate>
+          <ul>
+            <li>if \(e_1 \Rightarrow n_1\)</li>
+            <li>if \(e_2 \Rightarrow n_2\)</li>
+            <li>if \(n_1 + n_2 = n_3\)</li>
+            <li>then \(e \Rightarrow n_3\)</li>
+          </ul>
+          <p class='fragment fade-up'>\[\begin{array}{rl}
+            & e_1 \Rightarrow n_1\\
+            & e_2 \Rightarrow n_2\\
+            & n_1 + n_2 = n_3\\\hline
+            \therefore & e_1 + e_2 \Rightarrow n_3\\
+            \end{array}\]</p>
+        </section>
+        <section data-auto-animate>
+          <p>Rules of inference:</p>
+          <p class='fragment fade-up'><span style="color:blue;">\[\frac{H_1 ... H_n}{C}\]</span></p>
+          <ul>
+            <li class='fragment fade-up'>If the conditions <span style="color:blue;">\(H_1\) ...\(H_n\)</span>
+              ("hypotheses") are true, then the condition <span style="color:blue;">C</span> ("conclusion") is true</li>
+            <li class='fragment fade-up'>If \(n = 0\) (no hypotheses) then the conclusion automatically holds; this is
+              called an <span style="color:blue;">axiom</span></li>
+          </ul>
+          <!-- <p class='fragment fade-up'>\[\frac{e1 \Rightarrow n1\qquad e2 \Rightarrow n2\qquad n3\ \text{is}\ n1+n2}{e1+e2 \Rightarrow n3}\]</p> -->
+        </section>
+        <!-- <section data-auto-animate> -->
+        <section data-auto-animate>
+          <p>Syntax for the class:</p>
+          <p class='fragment fade-up'>\[\frac{H_1 ... H_n}{C}\]</p>
+          <p class='fragment fade-up'>\[\frac{e1 \Rightarrow n1\qquad e2 \Rightarrow n2\qquad n3\ \text{is}\
+            n1+n2}{e1+e2 \Rightarrow n3}\]</p>
+        </section>
+        <section data-auto-animate>
+          <pre style='width:300px;'><code data-trim>
+(* Grammar *)
+E -> n|E + E
+          </code></pre>
+          <p>Suppose \(e\) is a number \(n\):</p>
+          <p>\[\frac{}{n \Rightarrow n}\]</p>
+          <p>Suppose \(e\) is a an expression of \(e1 + e2\):
+          <p>
+          <p>\[\frac{e1 \Rightarrow n1\qquad e2 \Rightarrow n2\qquad n3\ \text{is}\ n1+n2}{e1+e2 \Rightarrow n3}\]</p>
+        </section>
+        <section data-auto-animate>
+          <p>Let's add more to the language</p>
+          <pre style='width:500px;'><code data-trim>
+(* Grammar *)
+E -> x|n|E + E|let x = E in E
+          </code></pre>
+          <ul>
+            <li class='fragment fade-up'>Where \(x\) is a variable name (identifier)</li>
+            <li class='fragment fade-up'>Where \(x \Rightarrow v\)</li>
+          </ul>
+          <p class='fragment fade-up'>We need an enviroment \(A\) to store variables and thier values</p>
+        </section>
+        <section data-auto-animate>
+          <pre style='width:500px;'><code data-trim>
+(* Grammar *)
+E -> x|n|E + E|let x = E in E
+          </code></pre>
+          <p>Suppose \(e\) is \(x\):</p>
+          <p>\[\frac{A(x) = v}{A; x \Rightarrow v}\]</p>
+        </section>
+        <section data-auto-animate>
+          <pre style='width:500px;'><code data-trim>
+(* Grammar *)
+E -> x|n|E + E|let x = E in E
+          </code></pre>
+          <p>Suppose \(e\) is \(x\):</p>
+          <p>\[\frac{A(x) = v}{A; x \Rightarrow v}\]</p>
+          <p>Suppose \(e\) is \(\text{let }x = e_1\ \text{in}\ e_2\):</p>
+          <p>\[\frac{A;e_1\Rightarrow v_1 \qquad A,x:v_1;e_2\Rightarrow v_2}{A;\text{let }x = e_1\ \text{in}\ e_2
+            \Rightarrow v2}\]</p>
+        </section>
+        <section data-auto-animate>
+          <pre style='width:500px;'><code data-trim>
+(* Grammar *)
+E -> x|n|E + E|let x = E in E
+          </code></pre>
+          <p>Putting it all together:</p>
+          <p style='font-size:14px'>Suppose \(e\) is a number \(n\):</p>
+          <p style='font-size:14px'>\[\frac{}{A;n \Rightarrow n}\]</p>
+          <p style='font-size:14px'>Suppose \(e\) is a an expression of \(e1 + e2\):
+          <p>
+          <p style='font-size:14px'>\[\frac{A;e1 \Rightarrow n1\qquad A;e2 \Rightarrow n2\qquad A;n3\ \text{is}\
+            n1+n2}{A;e1+e2 \Rightarrow n3}\]</p>
+          <p style='font-size:14px'>Suppose \(e\) is \(x\):</p>
+          <p style='font-size:14px'>\[\frac{A(x) = v}{A; x \Rightarrow v}\]</p>
+          <p style='font-size:14px'>Suppose \(e\) is \(\text{let }x = e_1\ \text{in}\ e_2\):</p>
+          <p style='font-size:14px'>\[\frac{A;e_1\Rightarrow v_1 \qquad A,x:v_1;e_2\Rightarrow v_2}{A;\text{let }x =
+            e_1\ \text{in}\ e_2 \Rightarrow v2}\]</p>
+        </section>
+        <section data-auto-animate>
+          <p>Putting it all together:</p>
+          <p style='font-size:14px'>Suppose \(e\) is a number \(n\):</p>
+          <p style='font-size:14px'>\[\frac{}{A;n \Rightarrow n}\]</p>
+          <p style='font-size:14px'>Suppose \(e\) is a an expression of \(e1 + e2\):
+          <p>
+          <p style='font-size:14px'>\[\frac{A;e1 \Rightarrow n1\qquad A;e2 \Rightarrow n2\qquad A;n3\ \text{is}\
+            n1+n2}{A;e1+e2 \Rightarrow n3}\]</p>
+          <p style='font-size:14px'>Suppose \(e\) is \(x\):</p>
+          <p style='font-size:14px'>\[\frac{A(x) = v}{A; x \Rightarrow v}\]</p>
+          <p style='font-size:14px'>Suppose \(e\) is \(\text{let }x = e_1\ \text{in}\ e_2\):</p>
+          <p style='font-size:14px'>\[\frac{A;e_1\Rightarrow v_1 \qquad A,x:v_1;e_2\Rightarrow v_2}{A;\text{let }x =
+            e_1\ \text{in}\ e_2 \Rightarrow v2}\]</p>
+          <p>Time to derive/create proofs</p>
+        </section>
+        <section data-auto-animate>
+          <p style='font-size:14px'>Suppose \(e\) is a number \(n\):</p>
+          <p style='font-size:14px'>\[\frac{}{A;n \Rightarrow n}\]</p>
+          <p style='font-size:14px'>Suppose \(e\) is a an expression of \(e1 + e2\):
+          <p>
+          <p style='font-size:14px'>\[\frac{A;e1 \Rightarrow n1\qquad A;e2 \Rightarrow n2\qquad A;n3\ \text{is}\
+            n1+n2}{A;e1+e2 \Rightarrow n3}\]</p>
+          <p style='font-size:14px'>Suppose \(e\) is \(x\):</p>
+          <p style='font-size:14px'>\[\frac{A(x) = v}{A; x \Rightarrow v}\]</p>
+          <p style='font-size:14px'>Suppose \(e\) is \(\text{let }x = e_1\ \text{in}\ e_2\):</p>
+          <p style='font-size:14px'>\[\frac{A;e_1\Rightarrow v_1 \qquad A,x:v_1;e_2\Rightarrow v_2}{A;\text{let }x =
+            e_1\ \text{in}\ e_2 \Rightarrow v2}\]</p>
+          <p>If these are the rules of our language: prove that <tt>2+4</tt> is both valid in the language and evaluates
+            to 6</p>
+        </section>
+        <section data-auto-animate>
+          <p>If these are the rules of our language: prove that <tt>2+4</tt> is both valid in the language and evaluates
+            to 6</p>
+          <p><tt>2+4</tt> is a an expression of \(e1 + e2\):
+          <p>
+          <p>\[\frac{A;e1 \Rightarrow n1\qquad A;e2 \Rightarrow n2\qquad A;n3\ \text{is}\ n1+n2}{A;e1+e2 \Rightarrow
+            n3}\]</p>
+          <p class='fragment fade-up'>\[\frac{\frac{}{A;2 \Rightarrow 2}\qquad \frac{}{A;4 \Rightarrow 4}\qquad A;6\
+            \text{is}\ 2+4}{A;2+4 \Rightarrow 6}\]</p>
+        </section>
+        <section data-auto-animate>
+          <p>If these are the rules of our language: prove that <tt>2+4</tt> is both valid in the language and evaluates
+            to 6</p>
+          <p><tt>2+4</tt> is a an expression of \(e1 + e2\):
+          <p>
+          <p>\[\frac{A;e1 \Rightarrow n1\qquad A;e2 \Rightarrow n2\qquad A;n3\ \text{is}\ n1+n2}{A;e1+e2 \Rightarrow
+            n3}\]</p>
+          <p>\[\frac{\frac{}{A;2 \Rightarrow 2}\qquad \frac{}{A;4 \Rightarrow 4}\qquad A;6\ \text{is}\ 2+4}{A;2+4
+            \Rightarrow 6}\]</p>
+          <p>Now prove that <tt>let x = 3 in x + 4</tt> is both valid in the language and evaluates to 7</p>
+        </section>
+        <section data-auto-animate>
+          <p>Now prove that <tt>let x = 3 in x + 4</tt> is both valid in the language and evaluates to 7</p>
+          <p style='font-size:32px'>\[\frac{}{A;\text{let }x = 3\ \text{in}\ x+4 \Rightarrow 7}\]</p>
+          <p style='font-size:14px'>Suppose \(e\) is a number \(n\):</p>
+          <p style='font-size:14px'>\[\frac{}{A;n \Rightarrow n}\]</p>
+          <p style='font-size:14px'>Suppose \(e\) is a an expression of \(e1 + e2\):
+          <p>
+          <p style='font-size:14px'>\[\frac{A;e1 \Rightarrow n1\qquad A;e2 \Rightarrow n2\qquad A;n3\ \text{is}\
+            n1+n2}{A;e1+e2 \Rightarrow n3}\]</p>
+          <p style='font-size:14px'>Suppose \(e\) is \(x\):</p>
+          <p style='font-size:14px'>\[\frac{A(x) = v}{A; x \Rightarrow v}\]</p>
+          <p style='font-size:14px'>Suppose \(e\) is \(\text{let }x = e_1\ \text{in}\ e_2\):</p>
+          <p style='font-size:14px'>\[\frac{A;e_1\Rightarrow v_1 \qquad A,x:v_1;e_2\Rightarrow v_2}{A;\text{let }x =
+            e_1\ \text{in}\ e_2 \Rightarrow v2}\]</p>
+
+        </section>
+        <section data-auto-animate>
+          <p>Now prove that <tt>let x = 3 in x + 4</tt> is both valid in the language and evaluates to 7</p>
+          <p style='font-size:28px'>\[\frac{\frac{}{A;3\Rightarrow 3}\qquad \frac{\frac{A,x:3(x)=3}{A,x:3;x\Rightarrow
+            3}\qquad\frac{}{A,x:3;4\Rightarrow 4}\qquad 7\text{ is }3+4}{A,x:3;x+4\Rightarrow 7}}{A;\text{let }x = 3\
+            \text{in}\ x+4 \Rightarrow 7}\]</p>
+        </section>
+        <section data-auto-animate>
+          <p>As our language gets more complicated, the more rules we need to have</p>
+          <pre style='width:500px;'><code data-trim>
+(* Grammar *)
+E -> x|n|E + E|let x = E in E
+    |true|false|eq0 E
+          </code></pre>
+          <p style='font-size:24px'>\[\frac{}{A;true \Rightarrow true}\]</p>
+          <p style='font-size:24px'>\[\frac{}{A;false \Rightarrow false}\]</p>
+          <p style='font-size:24px'>\[\frac{A;e \Rightarrow 0}{A;\text{eq0 } e \Rightarrow true}\]</p>
+          <p style='font-size:24px'>\[\frac{A;e \Rightarrow v\qquad v \neq 0}{A;\text{eq0 } e \Rightarrow false}\]</p>
+        </section>
+      </section>
+
+      <!-- <section data-auto-animate style="height:600px">
+					<h3>Definitional Interpreter</h3>
+					<div class='tl-circle' data-id="1" style="bottom:10px;"></div>
+					<div class='tl-circle' data-id="2" style="bottom:-10px;"></div>
+					<div class='tl-circle' data-id="3" style="bottom:-30px;"></div>
+					<div class='tl-circle' data-id="4" style="background:orange;bottom:-50px;"></div>
+          <section data-auto-animate>
+          <p>Let's go back to our simple language</p>
+          <pre style='width:600px;'><code class='fragment' data-trim>
+(* E -> n|E + E *)
+type expr = Num of int|Plus of expr * expr
+          </code></pre>
+          <p class='fragment fade-up' style='font-size:24px'>\[\frac{}{A;n \Rightarrow n}\]</p>
+          <p class='fragment fade-up' style='font-size:24px'>\[\frac{A;e1 \Rightarrow n1\qquad A;e2 \Rightarrow n2\qquad A;n3\ \text{is}\ n1+n2}{A;e1+e2 \Rightarrow n3}\]</p>
+          <pre style='width:500px;'><code class='fragment' data-trim data-line-numbers>
+let rec eval e =
+  match e with
+   Num(n) -> n
+  |Plus(e1,e2) -> 
+    let n1 = eval e1 in 
+    let n2 = eval e2 in 
+    let n3 = n1+n2 in 
+    n3
+  |_ -> failwith "error"
+          </code></pre>
+          </section>
+          <section data-auto-animate>
+          <p>Environment: a mapping from Identifiers to values</p>
+          <pre style='width:600px;font-size:14px;'><code class='fragment' data-trim>
+(* E -> x|n|E + E|let x = E in E *)
+type expr = Iden of string|Num of int|Plus of expr * expr
+            |Let of string * expr *expr
+
+let rec lookup env x = match env with
+   []-> failwith "undefined variable"
+  |(id,v)::t -> if x = id then v else 
+                lookup t x    
+
+let extend env x v = (x,v)::env
+          </code></pre>
+          <pre style='width:500px;font-size:14px;'><code class='fragment' data-trim data-line-numbers>
+let rec eval env e =
+  match e with
+   Iden(x) -> lookup env x
+  |Num(n) -> n
+  |Plus(e1,e2) -> 
+    let n1 = eval env e1 in 
+    let n2 = eval env e2 in 
+    let n3 = n1+n2 in 
+    n3
+  |Let (x,e1,e2) -> 
+    let v1 = eval env e1 in
+    let menv = extend env x v1 in
+    let v2 = eval menv e2 in
+    v2
+  |_ -> failwith "error"
+          </code></pre>
+          </section>
+        </section> -->
+    </div>
+  </div>
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/math/math.js"></script>
+  <script src="plugin/search/search.js"></script>
+  <script src="plugin/zoom/zoom.js"></script>
+  <script>
+    Reveal.configure({
+      keyboard: {
+        40: 'next', // go to the next slide with down arrow
+        38: 'prev', // go to the next slide with up arrow
+      }
+    });
+    Reveal.initialize({
+      center: true,
+      hash: true,
+      controlsTutorial: false,
+      showSlideNumber: 'print',
+      pdfSeparateFragments: false,
+      math: {
+        // mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+        config: 'TeX-AMS_HTML-full',
+        TeX: {
+          Macros: {
+            R: '\\mathbb{R}',
+            set: ['\\left\\{#1 \\; ; \\; #2\\right\\}', 2]
+          }
+        }
+      },
+      plugins: [RevealHighlight, RevealMarkdown, RevealMath, RevealSearch, RevealZoom]
+
+    });
+  </script>
+</body>
+
+</html>
